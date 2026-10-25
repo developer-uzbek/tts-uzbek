@@ -1,6 +1,6 @@
 """
 Infinite AI Text-to-Speech server with web UI + Telegram bot.
-- Works with Microsoft Edge Neural TTS
+- Uses Microsoft Edge Neural TTS
 - Includes API and optional Telegram channel subscription gate
 - Supports multiple styles and custom output filename
 """
@@ -29,6 +29,10 @@ PORT = int(os.environ.get("PORT", 5000))
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "").strip()
 START_TIME = time.time()
 BOT_ACTIVE = False
+
+PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "https://tts-uzbek.onrender.com").strip().rstrip("/")
+BOT_USERNAME = os.environ.get("BOT_USERNAME", "Uzbekcha_tts_bot").strip().lstrip("@")
+BOT_LINK = f"https://t.me/{BOT_USERNAME}" if BOT_USERNAME else "https://t.me/Uzbekcha_tts_bot"
 
 DEFAULT_AUDIO_FILENAME = os.environ.get("DEFAULT_AUDIO_FILENAME", "tts_audio").strip() or "tts_audio"
 SUBSCRIBE_REQUIRED = str(os.environ.get("SUBSCRIBE_REQUIRED", "true")).strip().lower() in {"1", "true", "yes", "on"}
@@ -165,6 +169,8 @@ def health_check():
         "uptime_seconds": uptime,
         "bot_active": BOT_ACTIVE,
         "service": "Infinite AI TTS",
+        "app_url": PUBLIC_BASE_URL,
+        "bot_url": BOT_LINK,
         "subscribe_required": SUBSCRIBE_REQUIRED,
         "telegram_channel": TELEGRAM_CHANNEL,
     }), 200
@@ -174,6 +180,8 @@ def health_check():
 def api_voices():
     return jsonify({
         "status": "success",
+        "app_url": PUBLIC_BASE_URL,
+        "bot_url": BOT_LINK,
         "voices": VOICES,
         "styles": STYLE_PRESETS,
         "subscribe_required": SUBSCRIBE_REQUIRED,
@@ -284,8 +292,10 @@ def start_telegram_bot_thread():
 
         bot.reply_to(
             msg,
-            "👋 <b>Assalomu alaykum!</b>\n\n"
+            "�� <b>Assalomu alaykum!</b>\n\n"
             "Men matnlarni professional sun'iy intellekt ovoziga aylantirib beraman.\n\n"
+            f"🌐 Sayt: <a href='{PUBLIC_BASE_URL}'>{PUBLIC_BASE_URL}</a>\n"
+            f"🤖 Bot: <a href='{BOT_LINK}'>{BOT_LINK}</a>\n\n"
             "✍️ Menga istalgan matn yuboring.\n\n"
             "🎙️ Ovozni o'zgartirish uchun /voice buyrug'ini bering.",
             reply_markup=voice_keyboard,
@@ -355,6 +365,8 @@ def main():
     print("=" * 60, flush=True)
     print("🌟 Infinite AI TTS (WEB + TELEGRAM BOT)", flush=True)
     print(f"📍 HOST: 0.0.0.0 | PORT: {PORT}", flush=True)
+    print(f"🌐 APP URL: {PUBLIC_BASE_URL}", flush=True)
+    print(f"🤖 BOT URL: {BOT_LINK}", flush=True)
     print(f"📣 SUBSCRIBE_REQUIRED: {SUBSCRIBE_REQUIRED} | TELEGRAM_CHANNEL: {TELEGRAM_CHANNEL or 'not set'}", flush=True)
     print("=" * 60, flush=True)
 
