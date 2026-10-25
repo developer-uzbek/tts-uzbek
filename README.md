@@ -1,51 +1,127 @@
-# 🎙️ Bepul va Cheksiz AI Text-to-Speech (Web Sayt + Telegram Bot)
+# 🎙️ Infinite AI TTS Generator
 
-Ushbu loyiha **Render.com** va **GitHub** uchun 100% tayyor holatga keltirilgan bo'lib, bir vaqtning o'zida ham **Veb-sayt**ni, ham **Telegram Bot**ni mutlaqo bepul (kartasiz) ishlatish imkonini beradi.
+Ushbu loyiha cheksiz AI text-to-speech generatsiyasini quyidagi 4 usul bilan taqdim etadi:
 
----
+1. Veb-sayt orqali
+2. Telegram bot orqali
+3. API orqali
+4. CMD / PowerShell / CLI orqali
 
-## 📁 Loyiha Tarkibi:
-* `combined_app.py` — Bosh server (Sayt va Telegram Botni parallel boshqaradi)
-* `index.html` va `public/index.html` — Zamonaviy Glassmorphism UI (CSS va JS ichida)
-* `render.yaml` — Render.com uchun avtomatik 1-bosishda sozlash fayli
-* `Procfile` — Render server ishga tushirish buyrug'i
-* `requirements.txt` — Barcha kerakli Python kutubxonalari
-* `.gitignore` — Keraksiz fayllarni GitHub'ga chiqarmaslik uchun
+Loyiha Microsoft Edge Neural TTS dan foydalanadi. Foydalanuvchilar mening saytim, botim, API'im yoki PowerShell/CMD orqali cheksiz audio fayllarini yaratishi mumkin.
 
 ---
 
-## 🚀 Render.com'ga Joylash (3 Bosqichda, 100% Kartasiz):
+## 1) Veb-sayt orqali ishlatish
 
-### 1-Qadam: GitHub'ga yuklash
-1. [github.com](https://github.com) ga kiring va yangi bo'sh repozitoriy yarating (masalan, `ai-tts-studio`).
-2. Ushbu papkadagi barcha fayllarni yangi ochilgan repozitoriyga yuklang (`Upload files` yoki Git orqali `git push`).
+Saytga kirib matnni yozing, ovoz turini tanlang, stilni tanlang va `Generate` tugmasini bosing.
 
-### 2-Qadam: Telegram Bot Tokenini olish (Ixtiyoriy)
-* Agar Telegram Bot ham ishlashini xohlasangiz:
-1. Telegramda **[@BotFather](https://t.me/BotFather)** ga kiring.
-2. `/newbot` buyrug'ini yozing va botingizga nom bering.
-3. BotFather sizga bergan **Token**ni nusxalab oling.
+- Mavjud ovozlar: Sardor, Madina, Ahmet, Dmitry, Alex
+- Mavjud stil: Robot, Minion, Narrator, Dramatic, Whisper, Cinematic
+- MP3 fayl avtomatik tarzda yuklab olinadi
 
-### 3-Qadam: Render.com'da 1 ta bosishda yoqish
-1. [render.com](https://render.com) ga kiring va **"Sign in with GitHub"** orqali kiring (Bank kartasi so'ramaydi).
-2. **"New +" ➔ "Web Service"** tugmasini bosing.
-3. GitHub'dagi `ai-tts-studio` repozitoriyangizni tanlang.
-4. Render avtomatik ravishda barcha sozlamalarni aniqlaydi:
-   * **Runtime:** `Python 3`
-   * **Build Command:** `pip install -r requirements.txt`
-   * **Start Command:** `python combined_app.py`
-   * **Instance Type:** `Free` ($0)
-5. **"Environment Variables"** bo'limida yangi o'zgaruvchi qo'shing:
-   * Key: `BOT_TOKEN`
-   * Value: `BotFather'dan olgan tokeningiz` *(agar faqat sayt kerak bo'lsa, buni bo'sh qoldirishingiz mumkin)*
-6. **"Deploy Web Service"** tugmasini bosing!
+## 2) Telegram bot orqali ishlatish
+
+Botga matn yuboring. Agar `SUBSCRIBE_REQUIRED=true` bo'lsa, kanalga obuna bo'lish shart bo'ladi.
+
+Environment variable:
+
+```bash
+BOT_TOKEN=your_telegram_token
+SUBSCRIBE_REQUIRED=true
+TELEGRAM_CHANNEL=@tgchannel
+```
+
+Botdan foydalanish:
+
+- `/start` buyrug'i
+- matn yuborish
+- kerakli ovozni tanlash
+
+## 3) API orqali ishlatish
+
+Base URL:
+
+```bash
+https://your-host-url/api/tts
+```
+
+POST so'rovi:
+
+```bash
+curl -X POST "https://your-host-url/api/tts" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Salom, bu mening TTS sinovim!",
+    "voice": "en-US-AlexNeural",
+    "style": "robot",
+    "filename": "my_voice_file"
+  }'
+```
+
+Yoki GET orqali:
+
+```bash
+https://your-host-url/api/tts?text=Salom%20bu%20mening%20TTS%20sinovim&voice=en-US-AlexNeural&style=robot&filename=my_voice_file
+```
+
+Bu linkdan MP3 audio fayl qaytariladi.
+
+## 4) CMD / PowerShell / CLI orqali ishlatish
+
+Bu usul orqali matnni linkga qo'shib yoki parametr sifatida yuborish imkoniyati mavjud.
+
+### PowerShell misoli
+
+```powershell
+$base = "https://your-host-url/api/tts"
+$text = "Salom, men PowerShell orqali audio yaratmoqdaman."
+$encoded = [System.Web.HttpUtility]::UrlEncode($text)
+$url = "$base?text=$encoded&voice=en-US-AlexNeural&style=minion&filename=power_tts"
+Invoke-WebRequest -Uri $url -OutFile "power_tts.mp3"
+```
+
+### CMD misoli
+
+```cmd
+curl -L "https://your-host-url/api/tts?text=Salom%20bu%20mening%20cmd%20sinovim&voice=en-US-AlexNeural&style=robot&filename=cmd_tts" -o cmd_tts.mp3
+```
+
+### Python CLI misoli
+
+```bash
+python -c "import requests; r=requests.get('https://your-host-url/api/tts', params={'text':'Salom bu python dan','voice':'en-US-AlexNeural','style':'dramatic','filename':'python_tts'}); open('python_tts.mp3','wb').write(r.content)"
+```
 
 ---
 
-## ⚡ Serverni 24/7 Doimiy Ishlatish (Uxlatmaslik):
-Render bepul tarifi 15 daqiqa murojaat bo'lmasa uyquga ketmasligi uchun:
-1. [cron-job.org](https://cron-job.org) ga kiring (100% bepul).
-2. Yangi cron job qo'shing: `https://sizning-saytingiz.onrender.com/health`
-3. Intervalni **har 10 daqiqaga** qo'ying.
+## Qisqa ishlatish ko'rsatmasi
 
-Shunda serveringiz hech qachon to'xtamaydi va yillab uzluksiz ishlaydi!
+- Sayt: `https://your-host-url/`
+- Health tekshirish: `https://your-host-url/health`
+- Ovozlar ro'yxati: `https://your-host-url/api/voices`
+
+## Muhit o'zgaruvchilari
+
+```bash
+BOT_TOKEN=your_telegram_token
+SUBSCRIBE_REQUIRED=true
+TELEGRAM_CHANNEL=@tgchannel
+PORT=5000
+```
+
+## Xavfsizlik va ishlatish
+
+- Cheksiz TTS generatsiyasi sayt, API, bot va shell orqali ishlatilishi mumkin.
+- Majburiy kanal obunasini yoqish mumkin.
+- Har bir xatolikni `health` endpoint orqali tekshirish mumkin.
+
+## Loyiha maqsadi
+
+Loyiha foydalanuvchiga 4 xil yondashuvdan birini tanlash imkonini beradi:
+
+- oddiy saytdan foydalanish
+- Telegram botdan foydalanish
+- backend API orqali audio yaratish
+- command shell orqali tez audio yaratish
+
+Shunday qilib, odamlar sizning linkingiz, botingiz yoki saytingiz orqali cheksiz TTS ishlatishi mumkin.
