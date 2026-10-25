@@ -37,12 +37,6 @@ SUBSCRIBE_REQUIRED = str(os.environ.get("SUBSCRIBE_REQUIRED", "false")).strip().
 TELEGRAM_CHANNEL = os.environ.get("TELEGRAM_CHANNEL", "").strip()
 
 
-def env_bool(value, default=False):
-    if value is None:
-        return default
-    return str(value).strip().lower() in {"1", "true", "yes", "on"}
-
-
 VOICES = [
     {
         "id": "uz-UZ-SardorNeural",
@@ -77,12 +71,12 @@ VOICES = [
         "desc": "Klassik professional diktor",
     },
     {
-        "id": "en-US-GuyNeural",
-        "name": "Guy (Inglizcha US)",
+        "id": "en-US-AlexNeural",
+        "name": "Alex (Inglizcha)",
         "gender": "Erkak",
         "lang": "en-US",
         "badge": "🇺🇸 Inglizcha",
-        "desc": "Dinamik, zamonaviy amerikacha ovoz",
+        "desc": "Aniq, zamonaviy va professional ovoz",
     },
 ]
 
@@ -101,7 +95,7 @@ def normalize_rate(value, default="+0%"):
     if not val:
         val = default
     if not (val.startswith("+") or val.startswith("-")):
-        val = f"+{val}"
+        val = f"+{val}" if not val.endswith("%") else val
     if not val.endswith("%"):
         val = f"{val}%"
     return val
@@ -112,7 +106,7 @@ def normalize_pitch(value, default="+0Hz"):
     if not val:
         val = default
     if not (val.startswith("+") or val.startswith("-")):
-        val = f"+{val}"
+        val = f"+{val}" if not val.endswith("Hz") else val
     if not val.endswith("Hz"):
         val = f"{val}Hz"
     return val
@@ -123,7 +117,7 @@ def normalize_volume(value, default="+0%"):
     if not val:
         val = default
     if not (val.startswith("+") or val.startswith("-")):
-        val = f"+{val}"
+        val = f"+{val}" if not val.endswith("%") else val
     if not val.endswith("%"):
         val = f"{val}%"
     return val
@@ -136,6 +130,19 @@ def sanitize_filename(raw_name, fallback=None):
     if not cleaned:
         cleaned = str(fallback or DEFAULT_FILENAME_PREFIX).strip()
     return cleaned
+
+
+def get_payload_from_request():
+    payload = request.get_json(force=True, silent=True) or {}
+    if isinstance(payload, dict):
+        return payload
+
+    merged = {}
+    for key in ["text", "voice", "style", "rate", "pitch", "volume", "filename", "file_name"]:
+        value = request.args.get(key)
+        if value is not None:
+            merged[key] = value
+    return merged
 
 
 async def synthesize_with_retry(
@@ -219,11 +226,12 @@ def api_voices():
     })
 
 
-@app.route("/api/tts", methods=["POST"])
+@app.route("/api/tts", methods=["GET", "POST"])
+@app.route("/api/tts/quick", methods=["GET", "POST"])
 def api_tts():
-    """Veb-saytdan kelgan matnni MP3 audio qilib qaytarish"""
+    """Veb-saytdan, API dan yoki CLI orqali matnni MP3 audio qilib qaytarish"""
     try:
-        data = request.get_json(force=True, silent=True) or {}
+        data = get_payload_from_request()
         text = str(data.get("text", "")).strip()
 
         if not text:
@@ -232,7 +240,7 @@ def api_tts():
         if len(text) > 5000:
             return jsonify({
                 "status": "error",
-                "message": "Matn juda uzun! Maksimal 5000 belgi yuboring.",
+                "message": "Matn juda uzun! Maksimal 5000 belgidan oshmasin.",
             }), 400
 
         voice = str(data.get("voice", "uz-UZ-SardorNeural")).strip() or "uz-UZ-SardorNeural"
@@ -310,7 +318,7 @@ def start_telegram_bot_thread():
         types.InlineKeyboardButton("🇺🇿 Madina (Ayol)", callback_data="set_uz-UZ-MadinaNeural"),
         types.InlineKeyboardButton("🇹🇷 Ahmet (Turkcha)", callback_data="set_tr-TR-AhmetNeural"),
         types.InlineKeyboardButton("🇷🇺 Dmitry (Ruscha)", callback_data="set_ru-RU-DmitryNeural"),
-        types.InlineKeyboardButton("🇺🇸 Guy (Inglizcha)", callback_data="set_en-US-GuyNeural"),
+        types.InlineKeyboardButton("🇺🇸 Alex (Inglizcha)", callback_data="set_en-US-AlexNeural"),
     )
 
     @bot.message_handler(commands=["start", "help"])
@@ -319,18 +327,17 @@ def start_telegram_bot_thread():
         if uid not in USER_TG_SETTINGS:
             USER_TG_SETTINGS[uid] = "uz-UZ-SardorNeural"
 
-        if SUBSCRIBE_REQUIRED and TELEGRAM_CHANNEL:
+        if SUBSCRIBE_REQUIRED and TELEGRAM_CHANNEL and not check_subscribed(bot, uid, TELEGRAM_CHANNEL):
             channel = get_channel_username(TELEGRAM_CHANNEL)
-            if not check_subscribed(bot, uid, TELEGRAM_CHANNEL):
-                markup = types.InlineKeyboardMarkup()
-                markup.add(types.InlineKeyboardButton("📣 Kanalga o'tish", url=f"https://t.me/{channel.lstrip('@')}"))
-                bot.reply_to(
-                    msg,
-                    f"📣 Botdan foydalanish uchun avval <b>{channel}</b> kanaliga obuna bo'ling."
-                    "\n\nObunani bajargach, /start buyrug'ini qayta yuboring.",
-                    reply_markup=markup,
-                )
-                return
+            markup = types.InlineKeyboardMarkup()
+            markup.add(types.InlineKeyboardButton("📣 Kanalga o'tish", url=f"https://t.me/{channel.lstrip('@')}"))
+            bot.reply_to(
+                msg,
+                f"📣 Botdan foydalanish uchun avval <b>{channel}</b> kanaliga obuna bo'ling.\n\n"
+                "Obunani bajargach, /start buyrug'ini qayta yuboring.",
+                reply_markup=markup,
+            )
+            return
 
         bot.reply_to(
             msg,
