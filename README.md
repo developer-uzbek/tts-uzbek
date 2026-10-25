@@ -38,13 +38,6 @@ Botga matn yuboring:
 https://t.me/Uzbekcha_tts_bot
 ```
 
-Agar `SUBSCRIBE_REQUIRED=true` bo'lsa, botdan foydalanishdan oldin kanalga obuna bo'lish kerak bo'ladi. Masalan:
-
-```bash
-SUBSCRIBE_REQUIRED=true
-TELEGRAM_CHANNEL=@tgchannel
-```
-
 Botdan foydalanish:
 
 - `/start` buyrug'i
@@ -128,10 +121,6 @@ python -c "import requests; r=requests.get('https://tts-uzbek.onrender.com/api/t
 ## Muhit o'zgaruvchilari
 
 ```bash
-BOT_TOKEN=your_telegram_token
-BOT_USERNAME=Uzbekcha_tts_bot
-SUBSCRIBE_REQUIRED=true
-TELEGRAM_CHANNEL=@tgchannel
 PUBLIC_BASE_URL=https://tts-uzbek.onrender.com
 PORT=5000
 ```
