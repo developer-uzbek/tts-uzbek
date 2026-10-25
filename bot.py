@@ -1,5 +1,5 @@
 """
-Free & Unlimited AI Text-to-Speech Telegram Bot
+Simple Telegram TTS bot using Microsoft Edge Neural voices.
 """
 
 import os
@@ -9,9 +9,12 @@ import telebot
 from telebot import types
 import edge_tts
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN")
-SUBSCRIBE_REQUIRED = os.getenv("SUBSCRIBE_REQUIRED", "true").strip().lower() in {"1", "true", "yes", "on"}
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+BOT_USERNAME = os.getenv("BOT_USERNAME", "Uzbekcha_tts_bot").strip().lstrip("@")
+BOT_LINK = f"https://t.me/{BOT_USERNAME}"
+SUBSCRIBE_REQUIRED = str(os.getenv("SUBSCRIBE_REQUIRED", "true")).strip().lower() in {"1", "true", "yes", "on"}
 TELEGRAM_CHANNEL = os.getenv("TELEGRAM_CHANNEL", "@tgchannel").strip()
+APP_BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://tts-uzbek.onrender.com").strip().rstrip("/")
 
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 USER_SETTINGS = {}
@@ -25,24 +28,24 @@ VOICE_MAP = {
 }
 
 
-def get_channel_username(value):
+def get_channel_username(channel_value):
+    value = str(channel_value or "").strip()
     if not value:
         return ""
-    val = str(value).strip()
-    if val.startswith("@"):
-        return val
-    if val.startswith("https://t.me/"):
-        return "@" + val.split("/", 3)[-1].strip("/")
-    if val.startswith("t.me/"):
-        return "@" + val.replace("t.me/", "").strip("/")
-    return "@" + val
+    if value.startswith("@"):
+        return value
+    if value.startswith("https://t.me/"):
+        return "@" + value.split("/", 3)[-1].strip("/")
+    if value.startswith("t.me/"):
+        return "@" + value.replace("t.me/", "").strip("/")
+    return "@" + value
 
 
-def check_subscribed(user_id):
+def is_subscribed(user_id):
     if not SUBSCRIBE_REQUIRED or not TELEGRAM_CHANNEL:
         return True
-    channel = get_channel_username(TELEGRAM_CHANNEL)
     try:
+        channel = get_channel_username(TELEGRAM_CHANNEL)
         member = bot.get_chat_member(chat_id=channel, user_id=user_id)
         return member.status in {"member", "administrator", "creator"}
     except Exception:
@@ -78,16 +81,23 @@ def send_welcome(message):
     if uid not in USER_SETTINGS:
         USER_SETTINGS[uid] = {"voice": "uz-UZ-SardorNeural", "name": "🇺🇿 Sardor (Erkak)", "rate": "+10%"}
 
-    if not check_subscribed(uid):
+    if SUBSCRIBE_REQUIRED and not is_subscribed(uid):
         channel = get_channel_username(TELEGRAM_CHANNEL)
         markup = types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton("📣 Kanalga o'tish", url=f"https://t.me/{channel.lstrip('@')}"))
-        bot.reply_to(message, f"📣 Ushbu botdan foydalanish uchun avval <b>{channel}</b> kanaliga obuna bo'ling.", reply_markup=markup)
+        bot.reply_to(
+            message,
+            f"📣 Botdan foydalanish uchun avval <b>{channel}</b> kanaliga obuna bo'ling.\n\n"
+            f"Bot rasmi: <a href='{BOT_LINK}'>{BOT_LINK}</a>",
+            reply_markup=markup,
+        )
         return
 
     text = (
         "👋 <b>Assalomu alaykum!</b>\n\n"
         "Men matnlarni <b>professional sun'iy intellekt ovoziga</b> aylantirib beruvchi bepul botman.\n\n"
+        f"🌐 Sayt: <a href='{APP_BASE_URL}'>{APP_BASE_URL}</a>\n"
+        f"🤖 Bot: <a href='{BOT_LINK}'>{BOT_LINK}</a>\n\n"
         f"🎙️ <b>Hozirgi ovoz:</b> {USER_SETTINGS[uid]['name']}\n\n"
         "✍️ <i>Menga istalgan matn yuboring, men darhol ovozli xabar qilib tashlab beraman!</i>\n"
         "Ovozni o'zgartirish uchun /voice buyrug'ini bosing."
@@ -97,7 +107,7 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['voice'])
 def change_voice(message):
-    if not check_subscribed(message.from_user.id):
+    if SUBSCRIBE_REQUIRED and not is_subscribed(message.from_user.id):
         channel = get_channel_username(TELEGRAM_CHANNEL)
         markup = types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton("📣 Kanalga o'tish", url=f"https://t.me/{channel.lstrip('@')}"))
@@ -109,6 +119,11 @@ def change_voice(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith("v_"))
 def callback_voice(call):
     uid = call.from_user.id
+    if SUBSCRIBE_REQUIRED and not is_subscribed(uid):
+        channel = get_channel_username(TELEGRAM_CHANNEL)
+        bot.answer_callback_query(call.id, f"📣 Avval {channel} kanaliga obuna bo'ling.")
+        return
+
     key = call.data.replace("v_", "")
     if key in VOICE_MAP:
         voice_id, voice_name = VOICE_MAP[key]
@@ -116,6 +131,7 @@ def callback_voice(call):
             USER_SETTINGS[uid] = {"rate": "+10%"}
         USER_SETTINGS[uid]["voice"] = voice_id
         USER_SETTINGS[uid]["name"] = voice_name
+
         bot.answer_callback_query(call.id, f"Tanlandi: {voice_name}")
         bot.edit_message_text(
             f"✅ <b>Ovoz o'zgartirildi!</b>\n\nHozirgi tanlangan ovoz: <b>{voice_name}</b>\n\nEndi matningizni yozib yuboring:",
@@ -126,7 +142,7 @@ def callback_voice(call):
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    if not check_subscribed(message.from_user.id):
+    if SUBSCRIBE_REQUIRED and not is_subscribed(message.from_user.id):
         channel = get_channel_username(TELEGRAM_CHANNEL)
         markup = types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton("📣 Kanalga o'tish", url=f"https://t.me/{channel.lstrip('@')}"))
@@ -142,9 +158,18 @@ def handle_text(message):
     bot.send_chat_action(message.chat.id, "record_audio")
 
     try:
-        audio_buf = asyncio.run(generate_audio_stream(text=text, voice=settings["voice"], rate=settings["rate"]))
+        audio_buf = asyncio.run(generate_audio_stream(
+            text=text,
+            voice=settings["voice"],
+            rate=settings["rate"],
+        ))
         audio_buf.name = "voice.ogg"
-        bot.send_voice(chat_id=message.chat.id, voice=audio_buf, caption=f"🎙️ Ovoz: <b>{settings['name']}</b>", reply_to_message_id=message.message_id)
+        bot.send_voice(
+            chat_id=message.chat.id,
+            voice=audio_buf,
+            caption=f"🎙️ Ovoz: <b>{settings['name']}</b>",
+            reply_to_message_id=message.message_id,
+        )
     except Exception as e:
         bot.reply_to(message, f"❌ Xatolik yuz berdi: {str(e)}")
 
@@ -152,5 +177,8 @@ def handle_text(message):
 if __name__ == "__main__":
     print("=" * 50)
     print("🤖 Telegram Bot ishga tushdi...")
+    print(f"🌐 APP URL: {APP_BASE_URL}")
+    print(f"🤖 BOT LINK: {BOT_LINK}")
+    print(f"📣 SUBSCRIBE_REQUIRED: {SUBSCRIBE_REQUIRED} | TELEGRAM_CHANNEL: {TELEGRAM_CHANNEL}")
     print("=" * 50)
     bot.infinity_polling(skip_pending=True)
