@@ -1,0 +1,21 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local testing logs
+*.log
+local_test.mp3
