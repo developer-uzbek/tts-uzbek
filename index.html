@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="uz" data-theme="midnight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VoiceCraft Pro — bepul O'zbekcha TTS</title>
+<meta name="description" content="Matnni tabiiy ovozga aylantiring va MP3 yuklab oling. O'zbek, rus, turk, ingliz va 40+ tilda. Bepul va cheksiz.">
+<meta name="theme-color" content="#080a18">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%236366f1'/%3E%3Cpath d='M7 16h2m3-5v10m4-13v16m4-12v8m3-5v2' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: light)').matches?'daylight':'midnight')}catch(e){}</script>
+<style>
+:root,[data-theme=midnight]{--bg:#080a18;--g1:rgba(99,102,241,.22);--g2:rgba(124,58,237,.14);--card:rgba(20,24,48,.62);--line:rgba(148,163,255,.13);--field:rgba(8,10,26,.62);--text:#e8eaff;--mut:#7f86ad;--a:#6366f1;--a2:#7c3aed;--on:#fff;--ok:#34d399;--warn:#fbbf24;--err:#f87171;color-scheme:dark}
+[data-theme=aurora]{--bg:#050f0c;--g1:rgba(16,185,129,.2);--g2:rgba(20,184,166,.12);--card:rgba(12,32,27,.62);--line:rgba(110,231,183,.14);--field:rgba(4,16,13,.62);--text:#e6fff6;--mut:#78a597;--a:#34d399;--a2:#14b8a6;--on:#03150e}
+[data-theme=ember]{--bg:#120806;--g1:rgba(249,115,22,.2);--g2:rgba(244,63,94,.12);--card:rgba(40,20,14,.62);--line:rgba(253,186,116,.14);--field:rgba(20,8,5,.62);--text:#fff0e6;--mut:#b08a78;--a:#fb923c;--a2:#f43f5e;--on:#1c0a02}
+[data-theme=ocean]{--bg:#050f18;--g1:rgba(14,165,233,.2);--g2:rgba(59,130,246,.14);--card:rgba(12,30,46,.62);--line:rgba(125,211,252,.14);--field:rgba(4,14,24,.62);--text:#e6f6ff;--mut:#7b9db3;--a:#38bdf8;--a2:#3b82f6;--on:#031322}
+[data-theme=orchid]{--bg:#12061a;--g1:rgba(217,70,239,.2);--g2:rgba(236,72,153,.12);--card:rgba(38,16,50,.62);--line:rgba(240,171,252,.14);--field:rgba(20,6,28,.62);--text:#fdeaff;--mut:#a883b5;--a:#e879f9;--a2:#f472b6;--on:#1d0623}
+[data-theme=daylight]{--bg:#f2f4fb;--g1:rgba(99,102,241,.15);--g2:rgba(14,165,233,.1);--card:rgba(255,255,255,.82);--line:rgba(30,41,90,.12);--field:rgba(238,241,252,.92);--text:#161a33;--mut:#646a8c;--a:#5b5df0;--a2:#7c3aed;--on:#fff;--ok:#059669;--warn:#b45309;--err:#dc2626;color-scheme:light}
+
+*{box-sizing:border-box;margin:0}
+html{background:var(--bg)}
+body{min-height:100vh;font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);
+  background:radial-gradient(60rem 38rem at 8% -12%,var(--g1),transparent 62%),radial-gradient(50rem 34rem at 100% 0,var(--g2),transparent 60%) fixed,var(--bg)}
+button,select,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+svg{display:block;flex:none}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 20px}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:22px;color:var(--on);background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 8px 24px -8px var(--a)}
+.brand b{display:block;font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.brand b i{font-style:normal;color:var(--a)}
+.brand small{color:var(--mut);font-size:12.5px}
+.hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bars{display:flex;align-items:center;gap:3px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.bars i{width:4px;height:calc(var(--h)*60%);border-radius:2px;background:linear-gradient(var(--a),var(--a2))}
+.bars.live i{animation:eq .9s ease-in-out infinite alternate;animation-delay:calc(var(--n)*-.12s)}
+@keyframes eq{to{transform:scaleY(.3)}}
+.themes{display:flex;gap:7px;padding:0 4px}
+.themes button{width:20px;height:20px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,var(--c1),var(--c2));padding:0;transition:transform .15s}
+.themes button:hover{transform:scale(1.15)}
+.themes button[aria-checked=true]{border-color:var(--text);box-shadow:0 0 0 2px var(--bg) inset}
+select{appearance:none;-webkit-appearance:none;width:100%;padding:10px 34px 10px 13px;border-radius:12px;border:1px solid var(--line);background:var(--field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237f86ad' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;text-overflow:ellipsis}
+select option{background:#fff;color:#111}
+#lang{width:auto;padding:7px 30px 7px 12px;font-size:13px;font-weight:500;background-color:var(--card)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:12.5px;font-weight:600;white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.pill[data-s=busy] i{background:var(--warn);animation:pulse 1s infinite}
+.pill[data-s=err] i{background:var(--err)}
+@keyframes pulse{50%{opacity:.3}}
+
+/* layout */
+main{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:22px;align-items:start}
+.col{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 0}
+.lbl,label>span[data-i]{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;color:var(--mut);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;border:1px solid var(--line);background:var(--field);font-size:12.5px;font-weight:500}
+.chip:hover{border-color:var(--a)}
+.chip:disabled{opacity:.45;cursor:default;border-color:var(--line)}
+.chip.danger:hover:not(:disabled){border-color:var(--err);color:var(--err)}
+.acts{display:flex;gap:8px}
+textarea{display:block;width:calc(100% - 32px);height:300px;margin:12px 16px 0;padding:0 8px 0 0;resize:vertical;border:0;background:transparent;font-size:15.5px;line-height:1.6;outline:0}
+textarea::placeholder{color:var(--mut)}
+.meta{display:flex;justify-content:space-between;padding:10px 16px 14px;color:var(--mut);font-size:12px}
+.meta b{font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--text)}
+.opts{padding:16px;display:grid;gap:16px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:grid;gap:8px;min-width:0}
+label>span:not([data-i]){display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--mut);font-size:12.5px;font-weight:500}
+.sl{padding-top:14px;border-top:1px solid var(--line)}
+output{font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--a)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--a),var(--a2)) 0/var(--p,50%) 100% no-repeat,var(--line);outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--a);border:3px solid var(--bg);box-shadow:0 0 0 1.5px var(--a)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--a);border:3px solid var(--bg);box-shadow:0 0 0 1.5px var(--a)}
+.go{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:100%;padding:15px;border:0;border-radius:15px;font-size:16px;font-weight:600;color:var(--on);background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 12px 30px -12px var(--a);transition:filter .15s,transform .15s}
+.go:hover{filter:brightness(1.08)}
+.go:active{transform:scale(.99)}
+.go::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);background:rgba(255,255,255,.22);transition:width .4s}
+.go span{position:relative;z-index:1;display:inline-flex;align-items:center;gap:9px}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(1turn)}}
+
+/* fayllar */
+.files{position:sticky;top:16px;display:flex;flex-direction:column;min-height:460px;max-height:calc(100vh - 40px)}
+.ttl{display:inline-flex;align-items:center;gap:10px;font-size:15px}
+.ttl .ic{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--field);border:1px solid var(--line);color:var(--a)}
+.ttl em{font:600 11px ui-monospace,Menlo,Consolas,monospace;font-style:normal;padding:3px 8px;border-radius:99px;background:var(--field);border:1px solid var(--line);color:var(--a)}
+.empty{flex:1;display:grid;place-content:center;justify-items:center;gap:8px;padding:30px;text-align:center;color:var(--mut);font-size:13px}
+.empty b{color:var(--text);font-size:14px}
+.empty .ic{display:grid;place-items:center;width:54px;height:54px;font-size:24px;border-radius:16px;background:var(--field);border:1px solid var(--line);margin-bottom:6px}
+#list{flex:1;list-style:none;padding:14px 16px;display:grid;gap:10px;align-content:start;overflow:auto}
+.file{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--field)}
+.file.on{border-color:var(--a)}
+.pb{width:42px;height:42px;display:grid;place-items:center;font-size:17px;border:0;border-radius:13px;color:var(--on);background:linear-gradient(135deg,var(--a),var(--a2))}
+.inf{min-width:0}
+.t{font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m{display:flex;gap:12px;flex-wrap:wrap;color:var(--mut);font-size:12px}
+.bar{position:relative;height:4px;margin:9px 0 3px;border-radius:2px;background:var(--line);cursor:pointer}
+.bar::before{content:"";position:absolute;inset:-9px 0}
+.bar::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);border-radius:2px;background:linear-gradient(90deg,var(--a),var(--a2))}
+.ib{display:flex;gap:4px}
+.ib>*{width:34px;height:34px;display:grid;place-items:center;font-size:16px;border-radius:10px;border:0;background:transparent;color:var(--mut);text-decoration:none}
+.ib>*:hover{background:var(--card);color:var(--text)}
+.ib .del:hover{color:var(--err)}
+.foot{padding:12px 16px;border-top:1px solid var(--line);color:var(--mut);font-size:12px}
+footer{display:flex;justify-content:center;gap:8px 22px;flex-wrap:wrap;padding:26px 0 6px;color:var(--mut);font-size:12.5px}
+footer a{color:var(--mut);text-decoration-color:var(--line);text-underline-offset:3px}
+footer a:hover{color:var(--a)}
+code{font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:2px 6px;border-radius:6px;background:var(--field);border:1px solid var(--line)}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);max-width:min(92vw,460px);padding:11px 16px;border-radius:12px;background:var(--text);color:var(--bg);font-size:13.5px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:900px){main{grid-template-columns:1fr}.files{position:static;max-height:none;min-height:0}.empty{padding:40px 20px}}
+@media(max-width:560px){.wrap{padding:16px 14px}.r2{grid-template-columns:1fr}.bars{display:none}textarea{height:240px}.file{grid-template-columns:auto minmax(0,1fr)}.ib{grid-column:1/-1;justify-content:flex-end}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="logo" data-i="wave"></span>
+      <div><b>VoiceCraft <i>Pro</i></b><small>TTS Speech Studio</small></div>
+    </div>
+    <div class="hd">
+      <div class="bars" id="bars" aria-hidden="true"></div>
+      <div class="themes" id="themes" role="radiogroup" aria-label="Mavzu"></div>
+      <select id="lang" aria-label="Til"></select>
+      <span class="pill" id="status" data-s="ready" role="status"><i></i><span>Tayyor</span></span>
+    </div>
+  </header>
+
+  <main>
+    <div class="col">
+      <section class="card">
+        <div class="ch">
+          <span class="lbl" data-i="text">Matn kiriting</span>
+          <span class="acts">
+            <button class="chip" id="sample" data-i="spark">Namuna</button>
+            <button class="chip danger" id="clearText" data-i="trash" aria-label="Matnni tozalash"></button>
+          </span>
+        </div>
+        <textarea id="text" maxlength="100000" spellcheck="false" aria-label="Matn" placeholder="Ovozga aylantirmoqchi bo'lgan matningizni shu yerga yozing…"></textarea>
+        <div class="meta"><span>Belgilar: <b id="chars">0</b></span><span>So'zlar: <b id="words">0</b></span></div>
+      </section>
+
+      <section class="card opts">
+        <div class="r2">
+          <label><span data-i="mic">Ovoz varianti</span><select id="voice"></select></label>
+          <label><span data-i="sliders">Ovoz stili</span><select id="style"></select></label>
+        </div>
+        <div class="r2 sl">
+          <label><span>Tezlik <output id="spv">1.0x</output></span><input type="range" id="speed" min="0.5" max="2" step="0.1" value="1"></label>
+          <label><span>Ton <output id="ptv">1.0</output></span><input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="1"></label>
+        </div>
+      </section>
+
+      <button class="go" id="go" title="Ctrl + Enter"><span data-i="spark">Ovoz yaratish</span></button>
+    </div>
+
+    <aside class="card files">
+      <div class="ch">
+        <span class="ttl"><span class="ic" data-i="music"></span><b>Yaratilgan MP3 fayllar</b><em id="count">0</em></span>
+        <button class="chip" id="clearAll" data-i="trash">Tozalash</button>
+      </div>
+      <div class="empty" id="empty">
+        <span class="ic" data-i="disc"></span>
+        <b>Hali ovoz fayllari mavjud emas</b>
+        <span>Chap tomonda matn kiriting va «Ovoz yaratish» tugmasini bosing</span>
+      </div>
+      <ul id="list" hidden></ul>
+      <div class="foot">Fayllar qurilmangizda saqlanadi</div>
+    </aside>
+  </main>
+
+  <footer>
+    <a id="botLink" href="https://t.me/Uzbekcha_tts_bot" target="_blank" rel="noopener">Telegram bot</a>
+    <span>Havola orqali: <code>/?q=Salom</code></span>
+    <span>Bepul va cheksiz</span>
+  </footer>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const ls = { get(k, d) { try { return localStorage.getItem(k) ?? d } catch { return d } }, set(k, v) { try { localStorage.setItem(k, v) } catch {} } };
+
+/* ---------- ikonlar ---------- */
+const P = {
+  wave: '<path d="M3 12h2m3-5v10m4-13v16m4-12v8m4-5v2"/>',
+  text: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  spark: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  disc: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>',
+  play: '<path d="M7 4.5v15l12-7.5z" fill="currentColor"/>',
+  pause: '<path d="M8 5v14M16 5v14" stroke-width="3.2"/>',
+  down: '<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+};
+const svg = n => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+document.querySelectorAll('[data-i]').forEach(e => e.insertAdjacentHTML('afterbegin', svg(e.dataset.i)));
+
+const toast = (() => { let t; return m => { const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(t); t = setTimeout(() => e.classList.remove('on'), 3400); }; })();
+
+/* ---------- mavzular ---------- */
+const THEMES = [
+  ['midnight', 'Yarim tun', '#6366f1', '#7c3aed'], ['aurora', 'Shimol nuri', '#34d399', '#14b8a6'],
+  ['ember', "Cho'g'", '#fb923c', '#f43f5e'], ['ocean', 'Okean', '#38bdf8', '#3b82f6'],
+  ['orchid', 'Orxideya', '#e879f9', '#f472b6'], ['daylight', 'Kunduz', '#5b5df0', '#7c3aed'],
+];
+const themesEl = $('#themes');
+THEMES.forEach(([id, name, c1, c2]) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.title = name; b.setAttribute('role', 'radio'); b.setAttribute('aria-label', name);
+  b.style.cssText = `--c1:${c1};--c2:${c2}`; b.dataset.t = id;
+  b.onclick = () => setTheme(id);
+  themesEl.append(b);
+});
+function setTheme(id) {
+  document.documentElement.dataset.theme = id; ls.set('theme', id);
+  themesEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.dataset.t === id));
+  $('meta[name=theme-color]').content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+}
+setTheme(document.documentElement.dataset.theme);
+
+/* ---------- ovoz tasmasi (bezak + holat) ---------- */
+const bars = $('#bars');
+[.35, .6, .85, .5, 1, .7, .45, .8, .55, .3, .5].forEach((h, n) => bars.insertAdjacentHTML('beforeend', `<i style="--h:${h};--n:${n}"></i>`));
+
+/* ---------- holat ---------- */
+const el = { text: $('#text'), voice: $('#voice'), style: $('#style'), lang: $('#lang'), speed: $('#speed'), pitch: $('#pitch'), go: $('#go'), list: $('#list') };
+const GO_IDLE = el.go.innerHTML;
+let busy = false, ctl = null, V = [];
+const setStatus = (s, t) => { const p = $('#status'); p.dataset.s = s; p.lastElementChild.textContent = t; };
+const live = () => bars.classList.toggle('live', busy || (!au.paused && !au.ended));
+
+/* ---------- matn ---------- */
+el.text.addEventListener('input', () => {
+  const t = el.text.value.trim();
+  $('#chars').textContent = el.text.value.length;
+  $('#words').textContent = t ? t.split(/\s+/).length : 0;
+  ls.set('vc.text', el.text.value.slice(0, 20000));
+});
+el.text.value = ls.get('vc.text', ''); el.text.dispatchEvent(new Event('input'));
+$('#clearText').onclick = () => { el.text.value = ''; el.text.dispatchEvent(new Event('input')); el.text.focus(); };
+const SAMPLES = {
+  uz: "VoiceCraft Pro yordamida matnlaringizni yuqori sifatli va tabiiy ovozga aylantirishingiz hamda MP3 ko'rinishida yuklab olishingiz mumkin. Xush kelibsiz!",
+  ru: 'С помощью VoiceCraft Pro вы можете превратить любой текст в естественную речь и скачать её в формате MP3. Добро пожаловать!',
+  tr: 'VoiceCraft Pro ile metinlerinizi doğal bir sese dönüştürebilir ve MP3 olarak indirebilirsiniz. Hoş geldiniz!',
+  en: 'With VoiceCraft Pro you can turn any text into natural speech and download it as an MP3. Welcome!',
+};
+$('#sample').onclick = () => {
+  el.text.value = SAMPLES[(el.lang.value || el.voice.value).slice(0, 2)] || SAMPLES.uz;
+  el.text.dispatchEvent(new Event('input'));
+};
+
+/* ---------- slayderlar ---------- */
+const fill = i => i.style.setProperty('--p', (i.value - i.min) / (i.max - i.min) * 100 + '%');
+function syncSliders() {
+  fill(el.speed); fill(el.pitch);
+  $('#spv').textContent = (+el.speed.value).toFixed(1) + 'x';
+  $('#ptv').textContent = (+el.pitch.value).toFixed(1);
+}
+[el.speed, el.pitch].forEach(i => { i.value = ls.get('vc.' + i.id, i.value); i.oninput = () => { syncSliders(); ls.set('vc.' + i.id, i.value); }; });
+syncSliders();
+
+/* ---------- ovozlar ---------- */
+function fillVoices() {
+  const l = el.lang.value, list = V.filter(v => !l || v.lang === l);
+  el.voice.innerHTML = '';
+  list.forEach(v => el.voice.add(new Option(`${v.name} — ${v.gender}${l ? '' : ' (' + v.lang + ')'}`, v.id)));
+  const saved = ls.get('vc.voice', '');
+  if (list.some(v => v.id === saved)) el.voice.value = saved;
+}
+async function init() {
+  try {
+    const r = await (await fetch('/api/voices')).json();
+    V = r.voices;
+    if (r.bot_url) $('#botLink').href = r.bot_url;
+    const first = ['uz-UZ', 'ru-RU', 'tr-TR', 'en-US'], rank = l => { const x = first.indexOf(l); return x < 0 ? 99 : x; };
+    const langs = [...new Set(V.map(v => v.lang))].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+    el.lang.innerHTML = '<option value="">Barcha tillar</option>' + langs.map(l => `<option value="${l}">${l.replace('-', ' ')}</option>`).join('');
+    const want = ls.get('vc.lang', 'uz-UZ');
+    el.lang.value = langs.includes(want) || want === '' ? want : '';
+    el.style.innerHTML = r.styles.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    el.style.value = ls.get('vc.style', 'natural');
+    fillVoices();
+  } catch { toast("Ovozlar ro'yxati yuklanmadi. Sahifani yangilang."); setStatus('err', 'Xatolik'); }
+}
+el.lang.onchange = () => { ls.set('vc.lang', el.lang.value); fillVoices(); };
+el.voice.onchange = () => ls.set('vc.voice', el.voice.value);
+el.style.onchange = () => ls.set('vc.style', el.style.value);
+
+/* ---------- yaratish ---------- */
+function split(t, max = 2500) {   // uzun matn: gap chegarasida bo'laklanadi, MP3 bo'laklari ketma-ket ulanadi
+  const out = []; let cur = '';
+  const flush = () => { if (cur.trim()) out.push(cur.trim()); cur = ''; };
+  for (let s of t.replace(/([.!?…])\s+/g, '$1\n').split(/\n+/)) {
+    while (s.length > max) { flush(); out.push(s.slice(0, max)); s = s.slice(max); }
+    if (cur.length + s.length + 1 > max) flush();
+    cur += s + ' ';
+  }
+  flush(); return out;
+}
+const params = () => ({ style: el.style.value, rate: Math.round((el.speed.value - 1) * 100), pitch: Math.round((el.pitch.value - 1) * 100) });
+async function tts(text) {
+  for (let k = 0; ; k++) {
+    try {
+      const r = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, voice: el.voice.value, ...params() }), signal: ctl.signal });
+      if (r.ok) return await r.blob();
+      const e = new Error((await r.json().catch(() => ({}))).message || 'Server xatosi ' + r.status);
+      e.fatal = r.status < 500 && r.status !== 429;
+      e.wait = (+r.headers.get('Retry-After') || 0) * 1000;
+      throw e;
+    } catch (e) {
+      if (e.name === 'AbortError' || e.fatal || k >= 3) throw e;
+      await sleep(e.wait || 1500 * (k + 1));
+    }
+  }
+}
+async function generate() {
+  if (busy) { ctl.abort(); return; }
+  const text = el.text.value.trim();
+  if (!text) { toast('Avval matn kiriting'); el.text.focus(); return; }
+  if (!el.voice.value) { toast('Ovoz tanlang'); return; }
+  busy = true; ctl = new AbortController(); setStatus('busy', 'Yaratilmoqda…'); live();
+  const parts = split(text), blobs = [];
+  try {
+    for (let i = 0; i < parts.length; i++) {
+      el.go.style.setProperty('--p', i / parts.length * 100 + '%');
+      el.go.innerHTML = `<span><i class="spin"></i>Yaratilmoqda… ${i + 1}/${parts.length}</span>`;
+      blobs.push(await tts(parts[i]));
+    }
+    await addFile(new Blob(blobs, { type: 'audio/mpeg' }), text);
+    setStatus('ready', 'Tayyor');
+  } catch (e) {
+    if (e.name === 'AbortError') { setStatus('ready', 'Tayyor'); toast('Bekor qilindi'); }
+    else { setStatus('err', 'Xatolik'); toast(e.message || "Ovoz yaratib bo'lmadi"); }
+  } finally {
+    busy = false; el.go.innerHTML = GO_IDLE; el.go.style.removeProperty('--p'); live();
+  }
+}
+el.go.onclick = generate;
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generate(); });
+
+/* ---------- fayllar (IndexedDB — faqat shu qurilmada) ---------- */
+const idb = new Promise((ok, no) => { try { const r = indexedDB.open('voicecraft', 1); r.onupgradeneeded = () => r.result.createObjectStore('f', { keyPath: 'id' }); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); } catch (e) { no(e); } });
+const db = (mode, fn) => idb.then(d => new Promise((ok, no) => { const t = d.transaction('f', mode), q = fn(t.objectStore('f')); t.oncomplete = () => ok(q && q.result); t.onerror = () => no(t.error); })).catch(() => null);
+const MAX_FILES = 40;
+let files = [], cur = null;
+const au = new Audio();
+
+const fmt = s => isFinite(s) && s > 0 ? Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0') : '0:00';
+const mb = b => b > 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1e3)) + ' KB';
+const duration = url => new Promise(r => { const a = new Audio(url); a.onloadedmetadata = () => r(a.duration); a.onerror = () => r(0); setTimeout(() => r(0), 4000); });
+
+async function addFile(blob, text) {
+  const url = URL.createObjectURL(blob), opt = el.voice.selectedOptions[0];
+  const rec = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ts: Date.now(), title: text.replace(/\s+/g, ' ').slice(0, 70),
+    text: text.length <= 400 ? text : '', voice: el.voice.value, vname: opt ? opt.textContent.split(' — ')[0] : '', size: blob.size, dur: await duration(url), q: params(), blob };
+  db('readwrite', s => s.put(rec));
+  files.unshift({ ...rec, url });
+  while (files.length > MAX_FILES) remove(files[files.length - 1].id, true);
+  render(); play(files[0]);
+}
+function remove(id, quiet) {
+  const i = files.findIndex(f => f.id === id); if (i < 0) return;
+  if (cur === id) { au.pause(); au.removeAttribute('src'); cur = null; }
+  URL.revokeObjectURL(files[i].url); files.splice(i, 1); db('readwrite', s => s.delete(id)); if (!quiet) render();
+}
+function linkFor(f) {   // sayt havolasi: /?q=matn&voice=...
+  const u = new URLSearchParams({ q: f.text, voice: f.voice });
+  if (f.q.style !== 'natural') u.set('style', f.q.style);
+  if (f.q.rate) u.set('rate', f.q.rate);
+  if (f.q.pitch) u.set('pitch', f.q.pitch);
+  return location.origin + '/?' + u;
+}
+function render() {
+  $('#count').textContent = files.length; $('#empty').hidden = files.length > 0; $('#clearAll').disabled = !files.length;
+  el.list.hidden = !files.length; el.list.innerHTML = '';
+  for (const f of files) {
+    const li = document.createElement('li'); li.className = 'file'; li.dataset.id = f.id;
+    li.innerHTML = `<button class="pb" aria-label="Ijro etish">${svg('play')}</button>
+      <div class="inf"><div class="t"></div><div class="m"><span class="v"></span><span class="tm">${fmt(f.dur)}</span><span>${mb(f.size)}</span><span>${new Date(f.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div><div class="bar" role="slider" aria-label="Ijro joyi"></div></div>
+      <div class="ib">${f.text ? `<button class="lk" title="?q= havolani nusxalash" aria-label="Havolani nusxalash">${svg('link')}</button>` : ''}<a download="tts-${f.vname.toLowerCase().replace(/[^a-z0-9]/g, '')}-${f.id}.mp3" href="${f.url}" title="Yuklab olish" aria-label="Yuklab olish">${svg('down')}</a><button class="del" title="O'chirish" aria-label="O'chirish">${svg('trash')}</button></div>`;
+    li.querySelector('.t').textContent = f.title; li.querySelector('.v').textContent = f.vname;
+    li.querySelector('.pb').onclick = () => toggle(f);
+    li.querySelector('.del').onclick = () => remove(f.id);
+    const lk = li.querySelector('.lk');
+    if (lk) lk.onclick = () => navigator.clipboard.writeText(linkFor(f)).then(() => toast('Havola nusxalandi'), () => toast(linkFor(f)));
+    li.querySelector('.bar').onclick = e => { if (cur === f.id && au.duration) { const r = e.currentTarget.getBoundingClientRect(); au.currentTime = (e.clientX - r.left) / r.width * au.duration; } };
+    el.list.append(li);
+  }
+  paint();
+}
+$('#clearAll').onclick = () => { if (files.length && confirm("Barcha yaratilgan fayllar o'chirilsinmi?")) { [...files].forEach(f => remove(f.id, true)); render(); } };
+
+/* ---------- ijro ---------- */
+function play(f) { if (cur !== f.id) { au.src = f.url; cur = f.id; } au.play().catch(() => {}); }
+function toggle(f) { cur === f.id && !au.paused ? au.pause() : play(f); }
+function paint() {
+  el.list.querySelectorAll('.file').forEach(li => {
+    const on = li.dataset.id === cur;
+    li.classList.toggle('on', on);
+    li.querySelector('.pb').innerHTML = svg(on && !au.paused && !au.ended ? 'pause' : 'play');
+    if (!on) li.querySelector('.bar').style.removeProperty('--p');
+  });
+  live();
+}
+['play', 'pause', 'ended', 'emptied'].forEach(ev => au.addEventListener(ev, paint));
+au.addEventListener('timeupdate', () => {
+  const li = el.list.querySelector(`[data-id="${cur}"]`);
+  if (!li || !au.duration) return;
+  li.querySelector('.bar').style.setProperty('--p', au.currentTime / au.duration * 100 + '%');
+  li.querySelector('.tm').textContent = fmt(au.currentTime) + ' / ' + fmt(au.duration);
+});
+
+/* ---------- boshlash ---------- */
+(async () => {
+  const saved = (await db('readonly', s => s.getAll())) || [];
+  files = saved.sort((a, b) => b.ts - a.ts).map(f => ({ ...f, url: URL.createObjectURL(f.blob) }));
+  render();
+})();
+init();
+})();
+</script>
+</body>
+</html>
