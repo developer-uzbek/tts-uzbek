@@ -18,6 +18,7 @@ PORT = int(os.environ.get("PORT", 5000))
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "https://tts-uzbek.onrender.com").strip().rstrip("/")
 BOT_USERNAME = os.environ.get("BOT_USERNAME", "Uzbekcha_tts_bot").strip().lstrip("@")
 BOT_URL = f"https://t.me/{BOT_USERNAME}"
+GITHUB_URL = os.environ.get("GITHUB_URL", "").strip()  # masalan https://github.com/<akkaunt>/tts-uzbek; bo'sh bo'lsa saytda ko'rsatilmaydi
 RATE_PER_MIN = int(os.environ.get("RATE_PER_MIN", 40))  # bitta IP uchun keshda yo'q so'rovlar/daqiqa; 0 = cheklovsiz
 DEFAULT_NAME = os.environ.get("DEFAULT_AUDIO_FILENAME", "tts_audio").strip() or "tts_audio"
 START = time.time()
@@ -99,6 +100,16 @@ def mp3():  # /tts.mp3?q=Salom — kengaytmali havola (Telegram inline va <audio
     return tts_response(request.args.to_dict())
 
 
+@app.route("/guide")
+def guide():
+    return send_from_directory(BASE_DIR, "guide.html")
+
+
+@app.route("/theme.css")
+def theme_css():  # index.html va guide.html uchun umumiy mavzular
+    return send_from_directory(BASE_DIR, "theme.css", mimetype="text/css")
+
+
 @app.route("/tts.py")
 def cli_script():
     return send_from_directory(BASE_DIR, "tts.py", mimetype="text/plain; charset=utf-8")
@@ -112,7 +123,7 @@ def api_tts():
 
 @app.route("/api/voices")
 def api_voices():
-    return jsonify({"status": "success", "app_url": PUBLIC_BASE_URL, "bot_url": BOT_URL, "max_chars": core.MAX_CHARS,
+    return jsonify({"status": "success", "app_url": PUBLIC_BASE_URL, "bot_url": BOT_URL, "github_url": GITHUB_URL, "max_chars": core.MAX_CHARS,
                     "voices": core.voices(),
                     "styles": [{"id": k, "name": v[0]} for k, v in core.STYLES.items()]})
 
@@ -122,7 +133,7 @@ def api_voices():
 def health():
     import bot
     return jsonify({"status": "healthy", "uptime_seconds": int(time.time() - START), "bot_active": bot.ACTIVE,
-                    "app_url": PUBLIC_BASE_URL, "bot_url": BOT_URL})
+                    "app_url": PUBLIC_BASE_URL, "bot_url": BOT_URL, "github_url": GITHUB_URL})
 
 
 def main():
