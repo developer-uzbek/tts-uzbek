@@ -6,12 +6,15 @@ zaxira nusxa (pin qilingan JSON) sifatida yuboriladi va bot qayta ishga tushgand
 """
 import io
 import os
+import html
+import asyncio
 import hashlib
+import urllib.request
 import re
 import json
 import time
 import threading
-from collections import deque
+from collections import OrderedDict, deque
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlencode, quote
 from pathlib import Path
@@ -46,6 +49,17 @@ LOCK = threading.Lock()
 FLAGS = {"save": False, "backup": False, "last_bk": 0.0, "bk_msg": 0}
 WAIT, POST, OK_UNTIL, HITS = {}, {}, {}, {}   # admin kutayotgan kiritish / tasdiqlanayotgan post / obuna keshi / bot limiti
 ME = {}
+INLINE = {"q": 0, "ok": 0, "err": ""}   # diagnostika: kelgan / javob berilgan inline so'rovlar, oxirgi xato
+FILE_IDS = OrderedDict()                   # (matn, ovoz) -> Telegram file_id: bir xil matn qayta yuklanmaydi
+STORAGE_KEEP = os.environ.get("STORAGE_KEEP", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def storage_chat():
+    """Inline audio vaqtincha yuklanadigan chat: STORAGE_CHAT_ID, bo'lmasa birinchi admin."""
+    raw = os.environ.get("STORAGE_CHAT_ID", "").strip()
+    if raw:
+        return int(raw) if re.fullmatch(r"-?\d+", raw) else raw
+    return ADMINS[0] if ADMINS else None
 
 
 def norm_channel(v):
@@ -257,7 +271,7 @@ def cmd_start(m):
 @bot.message_handler(commands=["voice"])
 def cmd_voice(m):
     if allowed(m.from_user.id, m.chat.id):
-        bot.send_message(m.chat.id, "🎙 Ovozni tanlang:", reply_markup=voice_kb())
+        bot.send_message(m.chat.id, "🎙 Ovozni tanlang.\nMatn tiliga mos ovoz tanlang: 🇺🇿 o'zbekcha · 🇹🇷 turkcha · 🇷🇺 ruscha · 🇺🇸 inglizcha", reply_markup=voice_kb())
 
 
 @bot.callback_query_handler(func=lambda c: c.data == "chk")
@@ -270,14 +284,25 @@ def cb_check(c):
         bot.send_message(c.message.chat.id, welcome(c.from_user.id), reply_markup=voice_kb(), disable_web_page_preview=True)
 
 
-@bot.callback_query_handler(func=lambda c: c.data.startswith("v:"))
-def cb_voice(c):
-    key = c.data[2:]
-    if not allowed(c.from_user.id, c.message.chat.id) or key not in VOICES:
+def pick_voice(c, key):
+    if not allowed(c.from_user.id, c.message.chat.id):
         return bot.answer_callback_query(c.id)
+    if key not in VOICES:
+        return bot.answer_callback_query(c.id, "Bu tugma eskirgan. /voice ni yuboring.", show_alert=True)
     touch(c.from_user.id, key)
     bot.answer_callback_query(c.id, f"Tanlandi: {VOICES[key][1]}")
     bot.edit_message_text(f"✅ Ovoz: <b>{VOICES[key][1]}</b>\n\nEndi matn yuboring.", c.message.chat.id, c.message.message_id)
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("v:"))
+def cb_voice(c):
+    pick_voice(c, c.data[2:])
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith(("set_", "v_")))
+def cb_legacy(c):  # botning eski versiyasidagi tugmalar: set_tr-TR-AhmetNeural, v_tr_ahmet
+    raw = c.data.split("_", 1)[1]
+    pick_voice(c, next((k for k, (i, _) in VOICES.items() if raw == i or raw.split("_")[-1] == k), None))
 
 
 # ---------- admin paneli ----------
@@ -296,7 +321,7 @@ def home_view():
     kb = types.InlineKeyboardMarkup(row_width=2)
     kb.add(btn("📢 Post yuborish", "a:post"), btn("📊 Statistika", "a:stat"),
            btn(f"🔒 Majburiy obuna: {'ON' if S['sub_on'] else 'OFF'}", "a:sub"),
-           btn("▶️ Davom ettirish" if paused else "⏸ To'xtatish", "a:resume" if paused else "a:pause"))
+           btn("▶️ Davom ettirish" if paused else "⏸ To'xtatish", "a:resume" if paused else "a:pause"), btn("🩺 Tekshiruv", "a:diag"))
     return f"🛠 <b>Admin paneli</b>\n\n👥 Foydalanuvchilar: <b>{len(S['users'])}</b>", kb
 
 
@@ -361,6 +386,53 @@ def broadcast(admin_chat, src_chat, src_msg):
     bot.edit_message_text(f"✅ Tugadi.\n\n📬 Yetkazildi: <b>{ok}</b>\n🚫 Yetkazilmadi (bloklagan): <b>{bad}</b>", admin_chat, status.message_id)
 
 
+SAMPLES = {"uz": "Salom, dunyo", "tr": "Merhaba dünya", "ru": "Привет, мир", "en": "Hello world"}
+
+
+def diag(chat):
+    """Adminga: inline yoqilganmi, har bir ovoz ishlaydimi, audio yuklash va ommaviy havola tekshiruvi."""
+    out, sample = ["🩺 <b>Tekshiruv</b>"], None
+    try:
+        me = bot.get_me()
+        on = getattr(me, "supports_inline_queries", False)
+        out.append(f"🤖 @{me.username} — inline: " + ("✅ yoqiq" if on else "❌ <b>O'CHIQ</b> → @BotFather → /setinline"))
+    except Exception as exc:
+        out.append(f"❌ getMe: {html.escape(str(exc)[:120])}")
+    out.append(f"🔎 Inline so'rovlar: kelgan <b>{INLINE['q']}</b>, javob berilgan <b>{INLINE['ok']}</b>"
+               + (f"\n     oxirgi xato: <code>{html.escape(INLINE['err'])}</code>" if INLINE["err"] else ""))
+    for key, (vid, name) in VOICES.items():
+        t0 = time.time()
+        try:
+            data = asyncio.run(core._run(SAMPLES.get(vid[:2], "Hello"), core.opts({"voice": vid})))
+            sample = sample or data
+            out.append(f"✅ {name} — {time.time() - t0:.1f} s, {len(data) // 1024} KB")
+        except Exception as exc:
+            out.append(f"❌ {name} — <code>{html.escape(str(exc)[:150])}</code>")
+    target = storage_chat()
+    if not target:
+        out.append("⚠️ Saqlash chati yo'q (ADMIN_ID yoki STORAGE_CHAT_ID kerak) — inline havola rejimida ishlaydi")
+    elif sample:
+        try:
+            fid = upload_audio(sample, "Test", "diag")
+            bot.delete_message(target, bot.send_audio(target, fid, disable_notification=True).message_id)  # file_id o'chirilgach ham ishlaydimi
+            out.append("✅ Inline audio (file_id) ishlaydi")
+        except Exception as exc:
+            out.append(f"❌ Inline audio (file_id): <code>{html.escape(str(exc)[:150])}</code>")
+    try:
+        t0, url = time.time(), f"{APP_URL}/tts.mp3?" + urlencode({"q": "Salom", "voice": "uz-UZ-SardorNeural", "sig": core.sign("Salom", "uz-UZ-SardorNeural")})
+        r = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "diag"}), timeout=30)
+        size, ctype = len(r.read()) // 1024, r.headers.get_content_type()
+        out.append(f"{'✅' if ctype == 'audio/mpeg' else '⚠️'} Havola: HTTP {r.status}, {ctype}, {size} KB, {time.time() - t0:.1f} s")
+    except Exception as exc:
+        out.append(f"❌ Havola ({APP_URL}): <code>{html.escape(str(exc)[:150])}</code>")
+    bot.send_message(chat, "\n".join(out))
+
+
+@bot.message_handler(commands=["diag"], func=lambda m: m.from_user.id in ADMINS)
+def cmd_diag(m):
+    threading.Thread(target=diag, args=(m.chat.id,), daemon=True).start()
+
+
 @bot.message_handler(commands=["admin"], func=lambda m: m.from_user.id in ADMINS)
 def cmd_admin(m):
     WAIT.pop(m.from_user.id, None)
@@ -420,6 +492,8 @@ def cb_admin(c):
         WAIT[uid] = "post"
         show(c, ("📢 Yuboriladigan postni yozing: <b>matn</b> yoki <b>rasm</b> (izoh bilan). Formatlash va tugmalar saqlanadi.",
                  types.InlineKeyboardMarkup().add(btn("🚫 Bekor qilish", "a:x"))))
+    elif act == "diag":
+        threading.Thread(target=diag, args=(c.message.chat.id,), daemon=True).start()
     elif act == "go" and uid in POST:
         src = POST.pop(uid)
         show(c, "📤 Yuborish boshlandi…")
@@ -497,7 +571,12 @@ def on_text(m):
         bot.reply_to(m, f"⏳ {exc}")
     except Exception as exc:
         print(f"❌ Bot TTS xatosi: {exc}", flush=True)
-        bot.reply_to(m, "❌ Ovoz yaratib bo'lmadi. Birozdan so'ng qayta urinib ko'ring.")
+        if "No audio" in str(exc) or "bo'sh audio" in str(exc):   # tanlangan ovoz bu matn tilini o'qiy olmaydi
+            bot.reply_to(m, f"⚠️ <b>{vname}</b> ovozi bu matnni o'qiy olmadi. Matn tiliga mos ovoz tanlang: /voice\n🇺🇿 o'zbekcha · 🇹🇷 turkcha · 🇷🇺 ruscha · 🇺🇸 inglizcha")
+        else:
+            bot.reply_to(m, "❌ Ovoz yaratib bo'lmadi. Birozdan so'ng qayta urinib ko'ring.")
+        if uid in ADMINS:
+            bot.send_message(m.chat.id, f"🛠 Sabab: <code>{html.escape(str(exc)[:300])}</code>")
 
 
 # ---------- inline rejim: istalgan chatda  @bot matn ----------
@@ -514,14 +593,41 @@ def article(key, title, desc, msg=None):
     return types.InlineQueryResultArticle(key, title, types.InputTextMessageContent(msg or f"🎙 @{BOT_USERNAME}"), description=desc)
 
 
+def upload_audio(data, text, vname):
+    """MP3 ni saqlash chatiga yuklab, Telegram file_id oladi (InlineQueryResultCachedAudio uchun)."""
+    target = storage_chat()
+    if not target:
+        return None
+    f = io.BytesIO(data)
+    f.name = "tts.mp3"
+    msg = bot.send_audio(target, f, title=short(text), performer=vname, disable_notification=True)
+    if not STORAGE_KEEP:
+        try:
+            bot.delete_message(target, msg.message_id)
+        except Exception:
+            pass
+    return msg.audio.file_id
+
+
 def inline_audio(text, key, uid):
-    """Matnni sintez qiladi (kesh isiydi, xato oldindan bilinadi) va audio natija qaytaradi.
-    Telegram MP3 ni bizning /tts.mp3 havolamizdan oladi — u keshdan darrov beriladi."""
+    """Matnni sintez qiladi. Natija: Telegram'dagi tayyor audio (CachedAudio); saqlash chati yo'q bo'lsa — /tts.mp3 havolasi."""
     vid, vname = VOICES.get(key, VOICES["sardor"])
-    core.synth(text, core.opts({"voice": vid, "rate": "+10"}), on_miss=lambda: throttle(uid, 30, "inline"), tries=1)
+    data = core.synth(text, core.opts({"voice": vid, "rate": "+10"}), on_miss=lambda: throttle(uid, 30, "inline"), tries=1)
+    rid = hashlib.md5(f"{vid}{text}".encode()).hexdigest()
+    fid = FILE_IDS.get((text, vid))                 # bir xil matn: qayta yuklanmaydi
+    if not fid:
+        try:
+            fid = upload_audio(data, text, vname)
+        except Exception as exc:
+            print(f"⚠️ Inline: audio yuklanmadi ({exc}) — havola rejimiga o'tildi", flush=True)
+        if fid:
+            FILE_IDS[(text, vid)] = fid
+            while len(FILE_IDS) > 2000:
+                FILE_IDS.popitem(last=False)
+    if fid:
+        return types.InlineQueryResultCachedAudio(rid, fid, caption=f"@{BOT_USERNAME}")
     url = f"{APP_URL}/tts.mp3?" + urlencode({"q": text, "voice": vid, "rate": 10, "sig": core.sign(text, vid)}, quote_via=quote)
-    return types.InlineQueryResultAudio(hashlib.md5(f"{vid}{text}".encode()).hexdigest(), url, f"🔊 {short(text)}",
-                                        caption=f"@{BOT_USERNAME}", performer=f"{vname} • TTS")
+    return types.InlineQueryResultAudio(rid, url, f"🔊 {short(text)}", caption=f"@{BOT_USERNAME}", performer=f"{vname} • TTS")
 
 
 def inline_work(q, text, reply):
@@ -539,10 +645,12 @@ def inline_work(q, text, reply):
             busy = True
         except Exception as exc:
             print(f"❌ Inline TTS xatosi: {exc}", flush=True)
+            INLINE["err"] = str(exc)[:200]
     if LATEST.get(uid) != q.id:
         return
     if results:
         S["inline"] = S.get("inline", 0) + 1
+        INLINE["ok"] += 1
         FLAGS["save"] = True
         return reply(results, cache=300)   # bir xil matn 5 daqiqa Telegram tomonida ham keshlanadi
     if busy:
@@ -554,6 +662,8 @@ def inline_work(q, text, reply):
 def on_inline(q):
     uid, text = q.from_user.id, (q.query or "").strip()
     LATEST[uid] = q.id
+    INLINE["q"] += 1
+    print(f"🔎 inline @{q.from_user.id}: {text[:40]!r}", flush=True)
 
     def reply(results, cache=0, button=None):
         try:
@@ -576,8 +686,13 @@ def on_inline(q):
     threading.Timer(INLINE_DELAY, inline_work, (q, text, reply)).start()
 
 
+@bot.callback_query_handler(func=lambda c: True)
+def cb_stale(c):  # hech bir handlerga mos kelmagan (eskirgan) tugma — "yuklanmoqda" aylanib qolmasin
+    bot.answer_callback_query(c.id, "Bu tugma eskirgan. /start ni yuboring.", show_alert=True)
+
+
 def run():
-    global ACTIVE
+    global ACTIVE, BOT_USERNAME
     if not ADMINS:
         print("ℹ️ ADMIN_ID o'rnatilmagan — admin paneli o'chiq. ID ni bilish uchun botga /id yozing.", flush=True)
     if not load() and ADMINS and restore():
@@ -588,11 +703,20 @@ def run():
         bot.remove_webhook()
     except Exception:
         pass
+    try:
+        me = bot.get_me()
+        BOT_USERNAME = me.username or BOT_USERNAME
+        inline_on = getattr(me, "supports_inline_queries", False)
+        print(f"🤖 @{BOT_USERNAME} | inline: {'yoqiq' if inline_on else 'O‘CHIQ (BotFather → /setinline)'}", flush=True)
+        if not inline_on and ADMINS:
+            bot.send_message(ADMINS[0], "⚠️ <b>Inline rejim yoqilmagan.</b>\n@BotFather → /setinline → botni tanlang → placeholder yozing (masalan: <code>Matn yozing…</code>).\nKeyin /diag bilan tekshiring.")
+    except Exception as exc:
+        print(f"⚠️ getMe: {exc}", flush=True)
     while True:
         try:
             ACTIVE = True
             print(f"✅ Telegram bot ishga tushdi | adminlar: {ADMINS or '—'}", flush=True)
-            bot.infinity_polling(timeout=20, long_polling_timeout=20)
+            bot.infinity_polling(timeout=20, long_polling_timeout=20, allowed_updates=["message", "callback_query", "inline_query", "chosen_inline_result"])
         except Exception as exc:
             ACTIVE = False
             print(f"⚠️ Bot xatosi: {exc}. 5 soniyadan so'ng qayta ulanadi…", flush=True)
