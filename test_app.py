@@ -64,6 +64,9 @@ class Web(unittest.TestCase):
     def test_pages(self):
         self.assertIn(b"VoiceCraft", c.get("/").data)
         self.assertIn(b"argparse", c.get("/tts.py").data)
+        self.assertIn(b"s2d", c.get("/guide").data)                      # qo'llanma sahifasi
+        self.assertIn(b"--bw", c.get("/theme.css").data)                 # umumiy mavzular
+        self.assertIn("github_url", c.get("/health").get_json())
         j = c.get("/api/voices").get_json()
         self.assertTrue(any(v["id"] == "uz-UZ-SardorNeural" for v in j["voices"]) and len(j["styles"]) == 5)
         self.assertEqual({v["gender"] for v in j["voices"]}, {"male", "female"})
@@ -134,35 +137,92 @@ class Bot(unittest.TestCase):
         with self.assertRaises(core.Busy):
             B.throttle(1, 2, "t")
 
-    def test_inline(self):
+    def _inline_env(self):
         B.INLINE_DELAY = 0
-        answers = []
-        B.bot.answer_inline_query = lambda qid, res, **kw: answers.append((res, kw))
-        q = lambda text, uid=7, qid="q1": SimpleNamespace(id=qid, query=text, from_user=SimpleNamespace(id=uid))
+        self.answers, self.uploads = [], []
+        B.FILE_IDS.clear()
+
+        def send_audio(chat, f, **kw):
+            self.uploads.append((chat, kw.get("title")))
+            return SimpleNamespace(message_id=len(self.uploads), audio=SimpleNamespace(file_id=f"FID{len(self.uploads)}"))
+        B.bot.send_audio, B.bot.delete_message = send_audio, lambda *a, **k: True
+        B.bot.answer_inline_query = lambda qid, res, **kw: self.answers.append((res, kw))
+        return lambda text, uid=7, qid="q1": SimpleNamespace(id=qid, query=text, from_user=SimpleNamespace(id=uid))
+
+    def test_inline_hints(self):
+        q = self._inline_env()
         B.on_inline(q(""))                                    # bo'sh matn -> ko'rsatma
         B.on_inline(q("a" * 201))                             # juda uzun -> ogohlantirish
-        self.assertEqual([a[0][0].id for a in answers], ["hint", "long"])
-        B.on_inline(q("Salom dunyo", qid="q2"))               # oddiy so'rov: sintez + 2 ta audio natija
-        time.sleep(0.6)
-        res, kw = answers[-1]
-        self.assertEqual(len(res), 2)
-        self.assertTrue(res[0].audio_url.startswith(B.APP_URL + "/tts.mp3?q=Salom%20dunyo&voice=uz-UZ-SardorNeural"))
-        self.assertEqual((res[0].caption, kw["cache_time"], kw["is_personal"]), ("@" + B.BOT_USERNAME, 300, True))
-        self.assertTrue(res[0].title.startswith("🔊 Salom") and "Sardor" in res[0].performer and res[0].id != res[1].id)
-        path = res[1].audio_url.split(B.APP_URL)[1]            # Telegram aynan shu havolani ochadi
-        self.assertEqual((c.get(path).status_code, c.get(path).mimetype), (200, "audio/mpeg"))
-        n = len(answers)
-        B.LATEST[7] = "yangisi"                               # eskirgan so'rovga javob berilmaydi
-        B.inline_work(q("x", 7, "eski"), "x", lambda *a, **k: answers.append("xato"))
-        self.assertEqual(len(answers), n)
+        self.assertEqual([a[0][0].id for a in self.answers], ["hint", "long"])
         B.S["pause_until"] = time.time() + 600                # pauza va obuna inline'da ham ishlaydi
         B.on_inline(q("salom", uid=8, qid="q3"))
-        self.assertEqual(answers[-1][0][0].id, "pause")
+        self.assertEqual(self.answers[-1][0][0].id, "pause")
         B.S.update(pause_until=0, sub_on=True, channels=["@kanal"])
         B.bot.get_chat_member = lambda ch, uid: SimpleNamespace(status="left")
         B.OK_UNTIL.clear()
         B.on_inline(q("salom", uid=9, qid="q4"))
-        self.assertEqual(answers[-1][0][0].id, "sub")
+        self.assertEqual(self.answers[-1][0][0].id, "sub")
+
+    def test_inline_cached_audio(self):
+        q = self._inline_env()
+        B.on_inline(q("Salom dunyo", qid="q2"))               # sintez + Telegram'ga yuklash + file_id natija
+        time.sleep(0.6)
+        res, kw = self.answers[-1]
+        self.assertEqual([type(r).__name__ for r in res], ["InlineQueryResultCachedAudio"] * 2)
+        self.assertEqual(sorted(r.audio_file_id for r in res), ["FID1", "FID2"])
+        self.assertEqual((res[0].caption, kw["cache_time"], kw["is_personal"]), ("@" + B.BOT_USERNAME, 300, True))
+        self.assertEqual(self.uploads[0], (1, "Salom dunyo"))      # saqlash chati = birinchi admin
+        B.on_inline(q("Salom dunyo", qid="q5"))               # bir xil matn: qayta yuklanmaydi
+        time.sleep(0.6)
+        self.assertEqual((len(self.uploads), len(self.answers[-1][0])), (2, 2))
+        n = len(self.answers)
+        B.LATEST[7] = "yangisi"                               # eskirgan so'rovga javob berilmaydi
+        B.inline_work(q("x", 7, "eski"), "x", lambda *a, **k: self.answers.append("xato"))
+        self.assertEqual(len(self.answers), n)
+
+    def test_inline_url_fallback(self):
+        q = self._inline_env()
+        B.bot.send_audio = lambda *a, **k: (_ for _ in ()).throw(OSError("chat not found"))   # saqlash chati ishlamasa
+        B.on_inline(q("Salom dunyo", qid="q6"))
+        time.sleep(0.6)
+        res, _ = self.answers[-1]
+        self.assertTrue(res[0].audio_url.startswith(B.APP_URL + "/tts.mp3?q=Salom%20dunyo&voice=uz-UZ-SardorNeural"))
+        self.assertTrue(res[0].title.startswith("🔊 Salom") and "Sardor" in res[0].performer and res[0].id != res[1].id)
+        path = res[1].audio_url.split(B.APP_URL)[1]            # Telegram aynan shu havolani ochadi
+        self.assertEqual((c.get(path).status_code, c.get(path).mimetype), (200, "audio/mpeg"))
+
+    def test_inline_through_telebot_dispatch(self):          # haqiqiy telebot yo'li: Update -> handler
+        q = self._inline_env()
+        upd = B.types.Update.de_json({"update_id": 1, "inline_query": {"id": "9", "from": {"id": 7, "is_bot": False, "first_name": "x"}, "query": "", "offset": ""}})
+        B.bot.process_new_updates([upd])
+        time.sleep(0.5)
+        self.assertEqual(self.answers[-1][0][0].id, "hint")
+
+    def test_old_buttons_still_work(self):
+        done = []
+        B.bot.answer_callback_query = lambda *a, **k: done.append(a[-1] if a else None)
+        B.bot.edit_message_text = lambda *a, **k: done.append("edit")
+        c = lambda data: SimpleNamespace(id="1", data=data, from_user=SimpleNamespace(id=5), message=SimpleNamespace(chat=SimpleNamespace(id=5), message_id=3))
+        for data in ("set_tr-TR-AhmetNeural", "v_tr_ahmet", "v:ahmet"):       # eski va yangi tugmalar
+            B.S["users"].pop("5", None)
+            B.cb_legacy(c(data)) if data[:2] in ("se", "v_") else B.cb_voice(c(data))
+            self.assertEqual(B.S["users"]["5"][2], "ahmet", data)
+        B.cb_legacy(c("set_en-US-AlexNeural"))                              # mavjud bo'lmagan ovoz: xabar, xato emas
+        self.assertIn("eskirgan", done[-1])
+
+    def test_diag(self):
+        out = []
+        B.bot.send_message = lambda chat, text, **kw: out.append(text)
+        B.bot.get_me = lambda: SimpleNamespace(username="Uzbekcha_tts_bot", supports_inline_queries=False)
+        B.bot.send_audio = lambda *a, **k: SimpleNamespace(message_id=1, audio=SimpleNamespace(file_id="F"))
+        B.bot.delete_message = lambda *a, **k: True
+        B.APP_URL = "http://127.0.0.1:9"                      # ulanib bo'lmaydigan manzil: xato matn bilan qaytishi kerak
+        B.diag(1)
+        text = out[-1]
+        self.assertIn("O'CHIQ", text)
+        self.assertIn("Ahmet", text)
+        self.assertEqual(text.count("✅ 🇺🇿") + text.count("✅ 🇹🇷"), 4)
+        self.assertIn("❌ Havola", text)
 
     def test_signed_link_skips_ip_limit(self):
         combined_app._hits.clear(); combined_app.RATE_PER_MIN = 1
