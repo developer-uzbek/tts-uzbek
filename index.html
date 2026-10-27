@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="uz" data-theme="midnight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VoiceCraft Pro — bepul O'zbekcha TTS</title>
+<meta name="description" content="Matnni tabiiy ovozga aylantiring va MP3 yuklab oling. O'zbek, rus, ingliz va 40+ tilda. Bepul va cheksiz.">
+<meta name="theme-color" content="#080a18">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%236366f1'/%3E%3Cpath d='M7 16h2m3-5v10m4-13v16m4-12v8m3-5v2' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Rubik:wght@500;700;800&family=Nunito:wght@600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: light)').matches?'paper':'midnight')}catch(e){}</script>
+<style>
+/* Har bir mavzu — alohida "dunyo": rang, shrift, burchak, chiziq, soya, fon. Hammasi o'zgaruvchilar orqali. */
+:root,[data-theme=midnight]{--tc:#080a18;--bg:radial-gradient(60rem 38rem at 8% -12%,rgba(99,102,241,.22),transparent 62%),radial-gradient(50rem 34rem at 100% 0,rgba(124,58,237,.14),transparent 60%),#080a18;--solid:#12162e;--card:rgba(20,24,48,.62);--field:rgba(8,10,26,.62);--bd:rgba(148,163,255,.14);--bw:1px;--cbw:1px;--text:#e8eaff;--mut:#8a91b8;--a:#6366f1;--a2:#7c3aed;--at:#8b90ff;--on:#fff;--btn:linear-gradient(135deg,#6366f1,#7c3aed);--r:18px;--rs:12px;--rb:15px;--sh:none;--csh:none;--gsh:0 12px 30px -12px #6366f1;--gbd:0 solid transparent;--blur:14px;--font:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--tt:uppercase;--ls:.08em;--lfs:11.5px;--fwt:700;--th:50%;--prog:rgba(255,255,255,.22);--ok:#34d399;--warn:#fbbf24;--err:#f87171;color-scheme:dark}
+[data-theme=paper]{--tc:#f3eee2;--bg:#f3eee2;--solid:#fffdf8;--card:#fffdf8;--field:#f7f2e6;--bd:#1c1a17;--text:#1c1a17;--mut:#6b6458;--a:#1b3a8a;--a2:#1b3a8a;--at:#1b3a8a;--on:#fffdf8;--btn:#1b3a8a;--r:3px;--rs:2px;--rb:2px;--sh:6px 6px 0 rgba(28,26,23,.1);--gsh:4px 4px 0 rgba(28,26,23,.25);--blur:0px;--font:Lora,Georgia,"Times New Roman",serif;--tt:none;--ls:0;--lfs:13.5px;--th:2px;--prog:rgba(255,255,255,.2);--ok:#1f7a4d;--warn:#9a6700;--err:#b42318;color-scheme:light}
+[data-theme=terminal]{--tc:#000;--bg:repeating-linear-gradient(0deg,rgba(57,255,20,.045) 0 1px,transparent 1px 3px),#000;--solid:#020a03;--card:#000a02;--field:#000;--bd:#1d7a2b;--text:#b8ffb8;--mut:#5aa564;--a:#39ff14;--a2:#39ff14;--at:#39ff14;--on:#000;--btn:#39ff14;--r:0;--rs:0;--rb:0;--sh:0 0 0 1px rgba(57,255,20,.12),0 0 30px -10px rgba(57,255,20,.5);--gsh:0 0 24px -4px rgba(57,255,20,.65);--blur:0px;--font:"JetBrains Mono",ui-monospace,Consolas,monospace;--tt:uppercase;--ls:.12em;--th:0;--prog:rgba(0,0,0,.25);color-scheme:dark}
+[data-theme=brutal]{--tc:#ffe14d;--bg:radial-gradient(rgba(0,0,0,.17) 1.3px,transparent 1.6px) 0 0/20px 20px,#ffe14d;--solid:#fff;--card:#fff;--field:#fff6c9;--bd:#000;--bw:3px;--cbw:2px;--text:#000;--mut:#3d3d3d;--a:#ff3d81;--a2:#ff3d81;--at:#c2005a;--on:#000;--btn:#ff3d81;--r:0;--rs:0;--rb:0;--sh:7px 7px 0 #000;--csh:3px 3px 0 #000;--gsh:6px 6px 0 #000;--gbd:3px solid #000;--blur:0px;--font:Rubik,system-ui,Arial,sans-serif;--tt:uppercase;--ls:.04em;--fwt:800;--th:0;--prog:rgba(0,0,0,.14);--ok:#008a4b;--warn:#a05a00;--err:#d00;color-scheme:light}
+[data-theme=sakura]{--tc:#ffe0ee;--bg:linear-gradient(160deg,#ffe0ee 0%,#e6d9fd 52%,#d4ecff 100%);--solid:#fff3f9;--card:rgba(255,255,255,.72);--field:rgba(255,255,255,.88);--bd:rgba(214,51,132,.2);--bw:2px;--cbw:1.5px;--text:#4a2450;--mut:#7e5a86;--a:#d63384;--a2:#7c4dff;--at:#b8236d;--on:#fff;--btn:linear-gradient(135deg,#d63384,#7c4dff);--r:30px;--rs:18px;--rb:999px;--sh:0 24px 50px -26px rgba(214,51,132,.6);--gsh:0 14px 28px -12px #d63384;--blur:12px;--font:Nunito,system-ui,sans-serif;--tt:none;--ls:0;--lfs:13.5px;--ok:#0f9d6b;--warn:#b45309;--err:#dc2626;color-scheme:light}
+[data-theme=sunset]{--tc:#c81d6b;--bg:linear-gradient(135deg,#e8452c 0%,#c81d6b 48%,#4a1f8f 100%);--solid:#3a0f4f;--card:rgba(32,6,44,.4);--field:rgba(255,255,255,.12);--bd:rgba(255,255,255,.3);--text:#fff;--mut:rgba(255,255,255,.76);--a:#ffd166;--a2:#ff9f43;--at:#ffd166;--on:#a3125a;--btn:#fff;--r:24px;--rs:14px;--rb:16px;--sh:0 30px 60px -30px rgba(0,0,0,.55);--gsh:0 14px 30px -10px rgba(0,0,0,.45);--blur:18px;--font:Montserrat,system-ui,sans-serif;--tt:none;--ls:0;--lfs:13.5px;--prog:rgba(163,18,90,.16);color-scheme:dark}
+
+*{box-sizing:border-box;margin:0}
+html{background:var(--tc)}
+body{min-height:100vh;font:15px/1.5 var(--font);color:var(--text);background:var(--bg);background-attachment:fixed}
+button,select,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--at);outline-offset:2px}
+svg{display:block;flex:none}
+[hidden]{display:none!important}
+
+.app{max-width:1180px;margin:0 auto;padding:22px 20px 20px;min-height:100vh;display:flex;flex-direction:column}
+header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;padding-bottom:16px;margin-bottom:20px;border-bottom:var(--cbw) solid var(--bd)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:var(--rs);display:grid;place-items:center;font-size:22px;color:var(--on);background:var(--btn);border:var(--gbd);box-shadow:var(--csh)}
+.brand b{display:block;font-size:19px;font-weight:var(--fwt);letter-spacing:-.01em;line-height:1.15}
+.brand b i{font-style:normal;color:var(--at)}
+.brand small{color:var(--mut);font-size:12.5px}
+.hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:relative}
+
+/* boshqaruv elementlari (chip, select, pill, mavzu tugmasi) */
+.ctl,.chip,select,.pill,.bars,.tbtn{border:var(--cbw) solid var(--bd);border-radius:var(--rs);background:var(--field);box-shadow:var(--csh)}
+.bars{display:flex;align-items:center;gap:3px;height:36px;padding:0 12px}
+.bars i{width:4px;height:calc(var(--h)*60%);border-radius:2px;background:linear-gradient(var(--a),var(--a2))}
+.bars.live i{animation:eq .9s ease-in-out infinite alternate;animation-delay:calc(var(--n)*-.12s)}
+@keyframes eq{to{transform:scaleY(.3)}}
+.sel{position:relative;min-width:0}
+.sel::after,.chev{content:"";position:absolute;right:14px;top:50%;width:7px;height:7px;border:solid var(--mut);border-width:0 2px 2px 0;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+select{appearance:none;-webkit-appearance:none;width:100%;padding:10px 36px 10px 13px;text-overflow:ellipsis;cursor:pointer}
+select option,select optgroup{background:var(--solid);color:var(--text)}
+#ui{width:auto;padding:8px 34px 8px 13px;font-size:13px;font-weight:600;height:36px}
+.pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 13px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.pill[data-s=busy] i{background:var(--warn);animation:pulse 1s infinite}
+.pill[data-s=err] i{background:var(--err)}
+@keyframes pulse{50%{opacity:.3}}
+
+/* mavzu menyusi */
+.tbtn{position:relative;display:inline-flex;align-items:center;gap:9px;height:36px;padding:0 34px 0 10px;font-size:13px;font-weight:600}
+.tbtn .sw{width:18px;height:18px;border-radius:calc(var(--rs)/2 + 2px);background:var(--btn);border:var(--cbw) solid var(--bd)}
+.tbtn .chev{right:12px}
+.tbtn[aria-expanded=true]{border-color:var(--a)}
+.menu{position:absolute;right:0;top:calc(100% + 10px);z-index:30;width:min(330px,92vw);display:grid;gap:3px;padding:8px;background:var(--solid);border:var(--bw) solid var(--bd);border-radius:var(--r);box-shadow:var(--sh),0 24px 60px -20px rgba(0,0,0,.55)}
+.mi{display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:center;padding:7px 9px;text-align:left;border:var(--cbw) solid transparent;border-radius:var(--rs);background:transparent}
+.mi:hover,.mi:focus-visible{background:var(--field)}
+.mi[aria-checked=true]{border-color:var(--a)}
+.mi b{display:block;font-size:14px}
+.mi small{color:var(--mut);font-size:12px}
+.pv{position:relative;width:62px;height:42px;border-radius:7px;overflow:hidden;border:1px solid rgba(128,128,128,.4)}
+.pv i{position:absolute;left:6px;right:6px;top:7px;height:16px;border-radius:3px;background:var(--pc)}
+.pv b{position:absolute;left:6px;bottom:7px;width:55%;height:7px;border-radius:3px;background:var(--pa)}
+
+/* tartib */
+main{display:grid;gap:20px;grid-template-columns:1fr}
+.col{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:var(--bw) solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur))}
+.txt{display:flex;flex-direction:column}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 0}
+.lbl,label>span[data-i]{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;color:var(--mut);font-size:var(--lfs);font-weight:600;letter-spacing:var(--ls);text-transform:var(--tt)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;font-size:12.5px;font-weight:500}
+.chip:hover{border-color:var(--a)}
+.chip:active{transform:translate(1px,1px)}
+.chip:disabled{opacity:.45;cursor:default;border-color:var(--bd)}
+.chip.danger:hover:not(:disabled){border-color:var(--err);color:var(--err)}
+.acts{display:flex;gap:8px}
+textarea{display:block;width:calc(100% - 32px);height:240px;margin:12px 16px 0;padding:0 8px 0 0;resize:none;border:0;background:transparent;font-size:15.5px;line-height:1.6;outline:0;caret-color:var(--a)}
+textarea::placeholder{color:var(--mut)}
+.meta{display:flex;justify-content:space-between;padding:10px 16px 14px;color:var(--mut);font-size:12px}
+.meta b{font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--text)}
+.opts{padding:16px;display:grid;gap:14px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+label{display:grid;gap:8px;min-width:0}
+label>span:not([data-i]){display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--mut);font-size:13px;font-weight:500}
+.more{display:inline-flex;align-items:center;gap:6px;justify-self:start;padding:2px 0;border:0;background:none;color:var(--at);font-size:12.5px;font-weight:600}
+.more:hover{text-decoration:underline;text-underline-offset:3px}
+.sl{padding-top:14px;border-top:var(--cbw) solid var(--bd)}
+output{font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--at)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:var(--th);background:linear-gradient(90deg,var(--a),var(--a2)) 0/var(--p,50%) 100% no-repeat,var(--bd);outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:var(--th);background:var(--a);border:3px solid var(--solid);box-shadow:0 0 0 1.5px var(--a)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:var(--th);background:var(--a);border:3px solid var(--solid);box-shadow:0 0 0 1.5px var(--a)}
+.go{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:100%;padding:15px;border:var(--gbd);border-radius:var(--rb);font-size:16px;font-weight:700;letter-spacing:var(--ls);text-transform:var(--tt);color:var(--on);background:var(--btn);box-shadow:var(--gsh);transition:filter .15s,transform .1s}
+.go:hover{filter:brightness(1.08)}
+.go:active{transform:translate(2px,2px)}
+.go::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);background:var(--prog);transition:width .4s}
+.go span{position:relative;z-index:1;display:inline-flex;align-items:center;gap:9px}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(1turn)}}
+
+/* fayllar: faqat shu ro'yxat scroll bo'ladi */
+.files{display:flex;flex-direction:column;max-height:560px}
+.ttl{display:inline-flex;align-items:center;gap:10px;font-size:15px}
+.ttl .ic{display:grid;place-items:center;width:30px;height:30px;border-radius:var(--rs);background:var(--field);border:var(--cbw) solid var(--bd);color:var(--at)}
+.ttl em{font:600 11px ui-monospace,Menlo,Consolas,monospace;font-style:normal;padding:3px 8px;border-radius:99px;background:var(--field);border:var(--cbw) solid var(--bd);color:var(--at)}
+.empty{flex:1;display:grid;place-content:center;justify-items:center;gap:8px;padding:30px;text-align:center;color:var(--mut);font-size:13px}
+.empty b{color:var(--text);font-size:14px}
+.empty .ic{display:grid;place-items:center;width:54px;height:54px;font-size:24px;border-radius:var(--rs);background:var(--field);border:var(--cbw) solid var(--bd);margin-bottom:6px}
+#list{flex:1;min-height:0;list-style:none;padding:14px 16px;display:grid;gap:10px;align-content:start;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--a) transparent}
+.file{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border-radius:var(--rs);border:var(--cbw) solid var(--bd);background:var(--field)}
+.file.on{border-color:var(--a)}
+.pb{width:42px;height:42px;display:grid;place-items:center;font-size:17px;border:var(--gbd);border-radius:var(--rs);color:var(--on);background:var(--btn)}
+.inf{min-width:0}
+.t{font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m{display:flex;gap:12px;flex-wrap:wrap;color:var(--mut);font-size:12px}
+.bar{position:relative;height:4px;margin:9px 0 3px;border-radius:2px;background:var(--bd);cursor:pointer}
+.bar::before{content:"";position:absolute;inset:-9px 0}
+.bar::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);border-radius:2px;background:linear-gradient(90deg,var(--a),var(--a2))}
+.ib{display:flex;gap:4px}
+.ib>*{width:34px;height:34px;display:grid;place-items:center;font-size:16px;border-radius:var(--rs);border:0;background:transparent;color:var(--mut);text-decoration:none}
+.ib>*:hover{background:var(--card);color:var(--text)}
+.ib .del:hover{color:var(--err)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-top:var(--cbw) solid var(--bd);color:var(--mut);font-size:12px}
+.foot a{color:var(--at);font-weight:600;text-underline-offset:3px}
+code{font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:2px 6px;border-radius:calc(var(--rs)/2);background:var(--field);border:var(--cbw) solid var(--bd)}
+.fl{display:flex;gap:12px;align-items:center}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);max-width:min(92vw,460px);padding:11px 16px;border-radius:var(--rs);background:var(--text);color:var(--solid);font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* kompyuter: sahifa scroll bo'lmaydi — chap ustun ekranga sig'adi, o'ng tomonda faqat MP3 ro'yxati aylanadi */
+@media (min-width:901px) and (min-height:621px){
+  html,body{height:100%;overflow:hidden}
+  .app{height:100vh;height:100dvh;min-height:0}
+  main{flex:1;min-height:0;grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+  .col{min-height:0}
+  .txt{flex:1;min-height:0}
+  textarea{flex:1;height:auto;min-height:70px}
+  .files{max-height:none;min-height:0}
+}
+@media (max-width:560px){.app{padding:16px 14px}.r2{grid-template-columns:1fr}.bars{display:none}.file{grid-template-columns:auto minmax(0,1fr)}.ib{grid-column:1/-1;justify-content:flex-end}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <span class="logo" data-i="wave"></span>
+      <div><b>VoiceCraft <i>Pro</i></b><small>TTS Speech Studio</small></div>
+    </div>
+    <div class="hd">
+      <div class="bars" id="bars" aria-hidden="true"></div>
+      <button class="tbtn" id="themeBtn" type="button" aria-haspopup="menu" aria-expanded="false"><i class="sw"></i><span id="themeName"></span><i class="chev"></i></button>
+      <div class="menu" id="themeMenu" role="menu" hidden></div>
+      <div class="sel"><select id="ui" aria-label="Til / Язык / Language"><option value="uz">O'zbekcha</option><option value="ru">Русский</option><option value="en">English</option></select></div>
+      <span class="pill" id="status" data-s="ready" role="status"><i></i><span></span></span>
+    </div>
+  </header>
+
+  <main>
+    <div class="col">
+      <section class="card txt">
+        <div class="ch">
+          <span class="lbl" data-i="text"><span data-t="textLabel"></span></span>
+          <span class="acts">
+            <button class="chip" id="sample" data-i="spark"><span data-t="sample"></span></button>
+            <button class="chip danger" id="clearText" data-i="trash" data-ta="clearTextA"></button>
+          </span>
+        </div>
+        <textarea id="text" maxlength="100000" spellcheck="false" data-ta="textLabel" data-tp="ph"></textarea>
+        <div class="meta"><span><span data-t="chars"></span>: <b id="chars">0</b></span><span><span data-t="words"></span>: <b id="words">0</b></span></div>
+      </section>
+
+      <section class="card opts">
+        <div class="r2">
+          <label><span data-i="mic"><span data-t="voiceLabel"></span></span>
+            <div class="sel"><select id="voice"></select></div>
+            <button class="more" id="more" type="button" aria-expanded="false"></button>
+          </label>
+          <label><span data-i="sliders"><span data-t="styleLabel"></span></span><div class="sel"><select id="style"></select></div></label>
+        </div>
+        <div class="r2 sl">
+          <label><span><span data-t="speed"></span><output id="spv">1.0x</output></span><input type="range" id="speed" min="0.5" max="2" step="0.1" value="1"></label>
+          <label><span><span data-t="pitch"></span><output id="ptv">1.0</output></span><input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="1"></label>
+        </div>
+      </section>
+
+      <button class="go" id="go" title="Ctrl + Enter"></button>
+    </div>
+
+    <aside class="card files">
+      <div class="ch">
+        <span class="ttl"><span class="ic" data-i="music"></span><b data-t="files"></b><em id="count">0</em></span>
+        <button class="chip" id="clearAll" data-i="trash"><span data-t="clearAll"></span></button>
+      </div>
+      <div class="empty" id="empty">
+        <span class="ic" data-i="disc"></span>
+        <b data-t="emptyT"></b>
+        <span data-t="emptyH"></span>
+      </div>
+      <ul id="list" hidden></ul>
+      <div class="foot"><span data-t="saved"></span><span class="fl"><code>/?q=Salom</code><a id="botLink" href="https://t.me/Uzbekcha_tts_bot" target="_blank" rel="noopener">Telegram bot</a></span></div>
+    </aside>
+  </main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const ls = { get(k, d) { try { return localStorage.getItem(k) ?? d } catch { return d } }, set(k, v) { try { localStorage.setItem(k, v) } catch {} } };
+
+/* ---------- tillar: o'zbekcha / ruscha / inglizcha ---------- */
+const L = {
+  uz: { title: "VoiceCraft Pro — bepul O'zbekcha TTS", theme: 'Mavzu', ready: 'Tayyor', busy: 'Yaratilmoqda…', err: 'Xatolik', textLabel: 'Matn kiriting', sample: 'Namuna', clearTextA: 'Matnni tozalash',
+    ph: "Ovozga aylantirmoqchi bo'lgan matningizni shu yerga yozing…", chars: 'Belgilar', words: "So'zlar", voiceLabel: 'Ovoz varianti', styleLabel: 'Ovoz stili', speed: 'Tezlik', pitch: 'Ton', go: 'Ovoz yaratish',
+    files: 'Yaratilgan MP3 fayllar', clearAll: 'Tozalash', emptyT: 'Hali ovoz fayllari mavjud emas', emptyH: "Chap tomonda matn kiriting va «Ovoz yaratish» tugmasini bosing", saved: 'Fayllar qurilmangizda saqlanadi',
+    more: 'Boshqa tillardagi ovozlar', less: 'Faqat asosiy ovozlar', male: 'Erkak', female: 'Ayol', needText: 'Avval matn kiriting', needVoice: 'Ovoz tanlang', cancelled: 'Bekor qilindi', copied: 'Havola nusxalandi',
+    loadFail: "Ovozlar ro'yxati yuklanmadi. Sahifani yangilang.", confirm: "Barcha yaratilgan fayllar o'chirilsinmi?", rate: "Juda tez! Biroz kutib, qayta urinib ko'ring.", long: "Matn juda uzun.",
+    play: 'Ijro etish', dl: 'Yuklab olish', del: "O'chirish", link: '?q= havolani nusxalash', seek: 'Ijro joyi',
+    s_natural: 'Tabiiy', s_deep: "Dev — chuqur va og'ir", s_chipmunk: 'Minion — ingichka va tez', s_hype: 'Reklama — tez va baland', s_calm: 'Sokin — sekin va yumshoq',
+    th_midnight: 'Tungi shisha', th_paper: "Qog'oz va siyoh", th_terminal: 'Qora ekran, yashil kod', th_brutal: 'Qalin va yorqin', th_sakura: 'Yumshoq pastel', th_sunset: 'Issiq gradient' },
+  ru: { title: 'VoiceCraft Pro — бесплатный синтез речи', theme: 'Тема', ready: 'Готово', busy: 'Создаётся…', err: 'Ошибка', textLabel: 'Введите текст', sample: 'Пример', clearTextA: 'Очистить текст',
+    ph: 'Вставьте сюда текст, который нужно озвучить…', chars: 'Символы', words: 'Слова', voiceLabel: 'Голос', styleLabel: 'Стиль голоса', speed: 'Скорость', pitch: 'Тон', go: 'Создать озвучку',
+    files: 'Созданные MP3-файлы', clearAll: 'Очистить', emptyT: 'Пока нет аудиофайлов', emptyH: 'Введите текст слева и нажмите «Создать озвучку»', saved: 'Файлы хранятся на вашем устройстве',
+    more: 'Голоса на других языках', less: 'Только основные голоса', male: 'Мужской', female: 'Женский', needText: 'Сначала введите текст', needVoice: 'Выберите голос', cancelled: 'Отменено', copied: 'Ссылка скопирована',
+    loadFail: 'Не удалось загрузить список голосов. Обновите страницу.', confirm: 'Удалить все созданные файлы?', rate: 'Слишком часто! Подождите немного и повторите.', long: 'Текст слишком длинный.',
+    play: 'Воспроизвести', dl: 'Скачать', del: 'Удалить', link: 'Скопировать ссылку ?q=', seek: 'Позиция',
+    s_natural: 'Естественный', s_deep: 'Великан — низкий и тяжёлый', s_chipmunk: 'Миньон — тонкий и быстрый', s_hype: 'Реклама — быстрый и громкий', s_calm: 'Спокойный — медленный и мягкий',
+    th_midnight: 'Ночное стекло', th_paper: 'Бумага и чернила', th_terminal: 'Чёрный экран, зелёный код', th_brutal: 'Жирный и яркий', th_sakura: 'Мягкий пастель', th_sunset: 'Тёплый градиент' },
+  en: { title: 'VoiceCraft Pro — free text to speech', theme: 'Theme', ready: 'Ready', busy: 'Generating…', err: 'Error', textLabel: 'Enter text', sample: 'Sample', clearTextA: 'Clear text',
+    ph: 'Paste the text you want to turn into speech…', chars: 'Characters', words: 'Words', voiceLabel: 'Voice', styleLabel: 'Voice style', speed: 'Speed', pitch: 'Pitch', go: 'Generate voice',
+    files: 'Generated MP3 files', clearAll: 'Clear', emptyT: 'No audio files yet', emptyH: 'Enter text on the left and press “Generate voice”', saved: 'Files are stored on your device',
+    more: 'Voices in other languages', less: 'Main voices only', male: 'Male', female: 'Female', needText: 'Enter some text first', needVoice: 'Choose a voice', cancelled: 'Cancelled', copied: 'Link copied',
+    loadFail: 'Could not load the voice list. Please refresh the page.', confirm: 'Delete all generated files?', rate: 'Too fast! Wait a moment and try again.', long: 'The text is too long.',
+    play: 'Play', dl: 'Download', del: 'Delete', link: 'Copy ?q= link', seek: 'Seek',
+    s_natural: 'Natural', s_deep: 'Giant — deep and heavy', s_chipmunk: 'Minion — high and quick', s_hype: 'Hype — fast and loud', s_calm: 'Calm — slow and soft',
+    th_midnight: 'Night glass', th_paper: 'Paper & ink', th_terminal: 'Black screen, green code', th_brutal: 'Bold & loud', th_sakura: 'Soft pastel', th_sunset: 'Warm gradient' },
+};
+let lang = ls.get('vc.ui', '');
+if (!L[lang]) { const n = (navigator.language || '').slice(0, 2); lang = n === 'ru' ? 'ru' : n === 'en' ? 'en' : 'uz'; }
+const t = (k, d) => L[lang][k] ?? L.uz[k] ?? d ?? k;
+
+/* ---------- ikonlar ---------- */
+const P = {
+  wave: '<path d="M3 12h2m3-5v10m4-13v16m4-12v8m4-5v2"/>',
+  text: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  spark: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  disc: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>',
+  play: '<path d="M7 4.5v15l12-7.5z" fill="currentColor"/>',
+  pause: '<path d="M8 5v14M16 5v14" stroke-width="3.2"/>',
+  down: '<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+};
+const svg = n => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+$$('[data-i]').forEach(e => e.insertAdjacentHTML('afterbegin', svg(e.dataset.i)));
+const toast = (() => { let h; return m => { const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(h); h = setTimeout(() => e.classList.remove('on'), 3400); }; })();
+
+/* ---------- mavzular: bitta tugma -> menyu ---------- */
+const TH = [  // id, nom, oldindan ko'rish: fon, karta, urg'u
+  ['midnight', 'Midnight', '#080a18', '#222850', 'linear-gradient(90deg,#6366f1,#7c3aed)'],
+  ['paper', 'Paper', '#f3eee2', '#fffdf8', '#1b3a8a'],
+  ['terminal', 'Terminal', '#000', '#06210b', '#39ff14'],
+  ['brutal', 'Brutal', '#ffe14d', '#fff', '#ff3d81'],
+  ['sakura', 'Sakura', 'linear-gradient(160deg,#ffe0ee,#e6d9fd,#d4ecff)', '#ffffffd0', 'linear-gradient(90deg,#d63384,#7c4dff)'],
+  ['sunset', 'Sunset', 'linear-gradient(135deg,#e8452c,#c81d6b,#4a1f8f)', '#ffffff40', '#ffd166'],
+];
+const menu = $('#themeMenu'), tbtn = $('#themeBtn');
+function buildMenu() {
+  const cur = document.documentElement.dataset.theme;
+  menu.innerHTML = '';
+  for (const [id, name, bg, card, a] of TH) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'mi'; b.dataset.t = id; b.setAttribute('role', 'menuitemradio'); b.setAttribute('aria-checked', id === cur);
+    b.innerHTML = `<span class="pv" style="background:${bg};--pc:${card};--pa:${a}"><i></i><b></b></span><span><b></b><small></small></span>`;
+    b.querySelector('span:last-child b').textContent = name; b.querySelector('small').textContent = t('th_' + id);
+    b.onclick = () => { setTheme(id); toggleMenu(false); tbtn.focus(); };
+    menu.append(b);
+  }
+}
+function toggleMenu(open) {
+  open = open ?? menu.hidden; menu.hidden = !open; tbtn.setAttribute('aria-expanded', open);
+  if (open) (menu.querySelector('[aria-checked=true]') || menu.firstChild).focus();
+}
+function setTheme(id) {
+  if (!TH.some(x => x[0] === id)) id = 'midnight';
+  document.documentElement.dataset.theme = id; ls.set('theme', id);
+  $('#themeName').textContent = TH.find(x => x[0] === id)[1];
+  tbtn.title = t('theme');
+  $$('#themeMenu .mi').forEach(b => b.setAttribute('aria-checked', b.dataset.t === id));
+  $('meta[name=theme-color]').content = getComputedStyle(document.documentElement).getPropertyValue('--tc').trim();
+}
+tbtn.onclick = () => toggleMenu();
+document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target) && !tbtn.contains(e.target)) toggleMenu(false); });
+document.addEventListener('keydown', e => {
+  if (menu.hidden) return;
+  const items = [...menu.children], i = items.indexOf(document.activeElement);
+  if (e.key === 'Escape') { toggleMenu(false); tbtn.focus(); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+});
+
+/* ---------- bezak ovoz tasmasi ---------- */
+const bars = $('#bars');
+[.35, .6, .85, .5, 1, .7, .45, .8, .55, .3, .5].forEach((h, n) => bars.insertAdjacentHTML('beforeend', `<i style="--h:${h};--n:${n}"></i>`));
+
+/* ---------- holat ---------- */
+const el = { text: $('#text'), voice: $('#voice'), style: $('#style'), speed: $('#speed'), pitch: $('#pitch'), go: $('#go'), list: $('#list'), more: $('#more'), ui: $('#ui') };
+let busy = false, ctl = null, V = [], ST = [], state = 'ready', showAll = false, progress = '';
+const setStatus = s => { state = s; const p = $('#status'); p.dataset.s = s; p.lastElementChild.textContent = t(s); };
+const live = () => bars.classList.toggle('live', busy || (!au.paused && !au.ended));
+const goIdle = () => { el.go.innerHTML = `<span>${svg('spark')}<span>${t('go')}</span></span>`; };
+
+/* ---------- matn ---------- */
+el.text.addEventListener('input', () => {
+  const v = el.text.value.trim();
+  $('#chars').textContent = el.text.value.length;
+  $('#words').textContent = v ? v.split(/\s+/).length : 0;
+  ls.set('vc.text', el.text.value.slice(0, 20000));
+});
+el.text.value = ls.get('vc.text', ''); el.text.dispatchEvent(new Event('input'));
+$('#clearText').onclick = () => { el.text.value = ''; el.text.dispatchEvent(new Event('input')); el.text.focus(); };
+const SAMPLES = {
+  uz: "VoiceCraft Pro yordamida matnlaringizni yuqori sifatli va tabiiy ovozga aylantirishingiz hamda MP3 ko'rinishida yuklab olishingiz mumkin. Xush kelibsiz!",
+  ru: 'С помощью VoiceCraft Pro вы можете превратить любой текст в естественную речь и скачать её в формате MP3. Добро пожаловать!',
+  tr: 'VoiceCraft Pro ile metinlerinizi doğal bir sese dönüştürebilir ve MP3 olarak indirebilirsiniz. Hoş geldiniz!',
+  en: 'With VoiceCraft Pro you can turn any text into natural speech and download it as an MP3. Welcome!',
+};
+$('#sample').onclick = () => { el.text.value = SAMPLES[(el.voice.value || '').slice(0, 2)] || SAMPLES.uz; el.text.dispatchEvent(new Event('input')); };
+
+/* ---------- slayderlar ---------- */
+const fill = i => i.style.setProperty('--p', (i.value - i.min) / (i.max - i.min) * 100 + '%');
+function syncSliders() {
+  fill(el.speed); fill(el.pitch);
+  $('#spv').textContent = (+el.speed.value).toFixed(1) + 'x';
+  $('#ptv').textContent = (+el.pitch.value).toFixed(1);
+}
+[el.speed, el.pitch].forEach(i => { i.value = ls.get('vc.' + i.id, i.value); i.oninput = () => { syncSliders(); ls.set('vc.' + i.id, i.value); }; });
+syncSliders();
+
+/* ---------- ovozlar: boshida 6 ta (uz, ru, en — 2 tadan), "boshqa tillar" tugmasi bilan hammasi ---------- */
+const PRIMARY = [['uz', ["uz-UZ-SardorNeural", "uz-UZ-MadinaNeural"]], ['ru', ['ru-RU-DmitryNeural', 'ru-RU-SvetlanaNeural']], ['en', ['en-US-AndrewNeural', 'en-US-AriaNeural']]];
+const NAT = { uz: "O'zbekcha", ru: 'Русский', en: 'English' };
+const PRIM_IDS = PRIMARY.flatMap(p => p[1]);
+const lname = l => { try { return new Intl.DisplayNames([lang], { type: 'language' }).of(l) || l; } catch { return l; } };
+const grp = label => { const g = document.createElement('optgroup'); g.label = label; return g; };
+function fillVoices() {
+  const want = el.voice.value || ls.get('vc.voice', PRIM_IDS[0]), byId = new Map(V.map(v => [v.id, v]));
+  const opt = v => new Option(`${v.name} — ${t(v.gender)}`, v.id);
+  el.voice.innerHTML = '';
+  for (const [code, ids] of PRIMARY) {
+    const g = grp(NAT[code]);
+    ids.forEach(id => byId.has(id) && g.append(opt(byId.get(id))));
+    if (g.children.length) el.voice.append(g);
+  }
+  if (showAll) {
+    const by = {};
+    V.filter(v => !PRIM_IDS.includes(v.id)).forEach(v => (by[v.lang] = by[v.lang] || []).push(v));
+    Object.keys(by).sort((a, b) => lname(a).localeCompare(lname(b))).forEach(l => { const g = grp(lname(l)); by[l].forEach(v => g.append(opt(v))); el.voice.append(g); });
+  }
+  el.voice.value = [...el.voice.options].some(o => o.value === want) ? want : (el.voice.options[0] || {}).value || '';
+  ls.set('vc.voice', el.voice.value);
+  el.more.setAttribute('aria-expanded', showAll);
+  el.more.innerHTML = `${svg(showAll ? 'minus' : 'plus')}<span>${t(showAll ? 'less' : 'more')}</span>`;
+}
+function fillStyles() {
+  const want = el.style.value || ls.get('vc.style', 'natural');
+  el.style.innerHTML = ST.map(s => `<option value="${s.id}"></option>`).join('');
+  [...el.style.options].forEach((o, i) => o.textContent = t('s_' + ST[i].id, ST[i].name));
+  el.style.value = ST.some(s => s.id === want) ? want : 'natural';
+}
+el.more.onclick = () => { showAll = !showAll; fillVoices(); };
+el.voice.onchange = () => ls.set('vc.voice', el.voice.value);
+el.style.onchange = () => ls.set('vc.style', el.style.value);
+async function init() {
+  try {
+    const r = await (await fetch('/api/voices')).json();
+    V = r.voices; ST = r.styles;
+    if (r.bot_url) $('#botLink').href = r.bot_url;
+    const saved = ls.get('vc.voice', '');
+    showAll = V.some(v => v.id === saved) && !PRIM_IDS.includes(saved);   // saqlangan ovoz asosiylar orasida bo'lmasa, ro'yxat ochiq turadi
+    fillVoices(); fillStyles();
+  } catch { toast(t('loadFail')); setStatus('err'); }
+}
+
+/* ---------- tilni qo'llash ---------- */
+function applyLang() {
+  document.documentElement.lang = lang; document.title = t('title'); el.ui.value = lang;
+  $$('[data-t]').forEach(e => e.textContent = t(e.dataset.t));
+  $$('[data-tp]').forEach(e => e.placeholder = t(e.dataset.tp));
+  $$('[data-ta]').forEach(e => { e.setAttribute('aria-label', t(e.dataset.ta)); if (e.tagName === 'BUTTON') e.title = t(e.dataset.ta); });
+  setStatus(state); if (!busy) goIdle();
+  buildMenu(); setTheme(document.documentElement.dataset.theme);
+  if (V.length) { fillVoices(); fillStyles(); }
+  render();
+}
+el.ui.onchange = () => { lang = el.ui.value; ls.set('vc.ui', lang); applyLang(); };
+
+/* ---------- yaratish ---------- */
+function split(s, max = 2500) {   // uzun matn: gap chegarasida bo'laklanadi, MP3 bo'laklari ketma-ket ulanadi
+  const out = []; let cur = '';
+  const flush = () => { if (cur.trim()) out.push(cur.trim()); cur = ''; };
+  for (let x of s.replace(/([.!?…])\s+/g, '$1\n').split(/\n+/)) {
+    while (x.length > max) { flush(); out.push(x.slice(0, max)); x = x.slice(max); }
+    if (cur.length + x.length + 1 > max) flush();
+    cur += x + ' ';
+  }
+  flush(); return out;
+}
+const params = () => ({ style: el.style.value, rate: Math.round((el.speed.value - 1) * 100), pitch: Math.round((el.pitch.value - 1) * 100) });
+async function tts(text) {
+  for (let k = 0; ; k++) {
+    try {
+      const r = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, voice: el.voice.value, ...params() }), signal: ctl.signal });
+      if (r.ok) return await r.blob();
+      const m = (await r.json().catch(() => ({}))).message;
+      const e = new Error(r.status === 429 ? t('rate') : r.status === 413 ? t('long') : m || 'HTTP ' + r.status);
+      e.fatal = r.status < 500 && r.status !== 429;
+      e.wait = (+r.headers.get('Retry-After') || 0) * 1000;
+      throw e;
+    } catch (e) {
+      if (e.name === 'AbortError' || e.fatal || k >= 3) throw e;
+      await sleep(e.wait || 1500 * (k + 1));
+    }
+  }
+}
+async function generate() {
+  if (busy) { ctl.abort(); return; }
+  const text = el.text.value.trim();
+  if (!text) { toast(t('needText')); el.text.focus(); return; }
+  if (!el.voice.value) { toast(t('needVoice')); return; }
+  busy = true; ctl = new AbortController(); setStatus('busy'); live();
+  const parts = split(text), blobs = [];
+  try {
+    for (let i = 0; i < parts.length; i++) {
+      el.go.style.setProperty('--p', i / parts.length * 100 + '%');
+      el.go.innerHTML = `<span><i class="spin"></i>${t('busy')} ${i + 1}/${parts.length}</span>`;
+      blobs.push(await tts(parts[i]));
+    }
+    await addFile(new Blob(blobs, { type: 'audio/mpeg' }), text);
+    setStatus('ready');
+  } catch (e) {
+    if (e.name === 'AbortError') { setStatus('ready'); toast(t('cancelled')); }
+    else { setStatus('err'); toast(e.message || t('err')); }
+  } finally {
+    busy = false; goIdle(); el.go.style.removeProperty('--p'); live();
+  }
+}
+el.go.onclick = generate;
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generate(); });
+
+/* ---------- fayllar (IndexedDB — faqat shu qurilmada) ---------- */
+const idb = new Promise((ok, no) => { try { const r = indexedDB.open('voicecraft', 1); r.onupgradeneeded = () => r.result.createObjectStore('f', { keyPath: 'id' }); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); } catch (e) { no(e); } });
+const db = (mode, fn) => idb.then(d => new Promise((ok, no) => { const tx = d.transaction('f', mode), q = fn(tx.objectStore('f')); tx.oncomplete = () => ok(q && q.result); tx.onerror = () => no(tx.error); })).catch(() => null);
+const MAX_FILES = 40;
+let files = [], cur = null;
+const au = new Audio();
+const fmt = s => isFinite(s) && s > 0 ? Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0') : '0:00';
+const mb = b => b > 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1e3)) + ' KB';
+const duration = url => new Promise(r => { const a = new Audio(url); a.onloadedmetadata = () => r(a.duration); a.onerror = () => r(0); setTimeout(() => r(0), 4000); });
+
+async function addFile(blob, text) {
+  const url = URL.createObjectURL(blob), opt = el.voice.selectedOptions[0];
+  const rec = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ts: Date.now(), title: text.replace(/\s+/g, ' ').slice(0, 70),
+    text: text.length <= 400 ? text : '', voice: el.voice.value, vname: opt ? opt.textContent.split(' — ')[0] : '', size: blob.size, dur: await duration(url), q: params(), blob };
+  db('readwrite', s => s.put(rec));
+  files.unshift({ ...rec, url });
+  while (files.length > MAX_FILES) remove(files[files.length - 1].id, true);
+  render(); play(files[0]);
+}
+function remove(id, quiet) {
+  const i = files.findIndex(f => f.id === id); if (i < 0) return;
+  if (cur === id) { au.pause(); au.removeAttribute('src'); cur = null; }
+  URL.revokeObjectURL(files[i].url); files.splice(i, 1); db('readwrite', s => s.delete(id)); if (!quiet) render();
+}
+function linkFor(f) {   // sayt havolasi: /?q=matn&voice=...
+  const u = new URLSearchParams({ q: f.text, voice: f.voice });
+  if (f.q.style !== 'natural') u.set('style', f.q.style);
+  if (f.q.rate) u.set('rate', f.q.rate);
+  if (f.q.pitch) u.set('pitch', f.q.pitch);
+  return location.origin + '/?' + u;
+}
+function render() {
+  $('#count').textContent = files.length; $('#empty').hidden = files.length > 0; $('#clearAll').disabled = !files.length;
+  el.list.hidden = !files.length; el.list.innerHTML = '';
+  for (const f of files) {
+    const li = document.createElement('li'); li.className = 'file'; li.dataset.id = f.id;
+    li.innerHTML = `<button class="pb" aria-label="${t('play')}">${svg('play')}</button>
+      <div class="inf"><div class="t"></div><div class="m"><span class="v"></span><span class="tm">${fmt(f.dur)}</span><span>${mb(f.size)}</span><span>${new Date(f.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div><div class="bar" role="slider" aria-label="${t('seek')}"></div></div>
+      <div class="ib">${f.text ? `<button class="lk" title="${t('link')}" aria-label="${t('link')}">${svg('link')}</button>` : ''}<a download="tts-${f.vname.toLowerCase().replace(/[^a-z0-9]/g, '')}-${f.id}.mp3" href="${f.url}" title="${t('dl')}" aria-label="${t('dl')}">${svg('down')}</a><button class="del" title="${t('del')}" aria-label="${t('del')}">${svg('trash')}</button></div>`;
+    li.querySelector('.t').textContent = f.title; li.querySelector('.v').textContent = f.vname;
+    li.querySelector('.pb').onclick = () => toggle(f);
+    li.querySelector('.del').onclick = () => remove(f.id);
+    const lk = li.querySelector('.lk');
+    if (lk) lk.onclick = () => navigator.clipboard.writeText(linkFor(f)).then(() => toast(t('copied')), () => toast(linkFor(f)));
+    li.querySelector('.bar').onclick = e => { if (cur === f.id && au.duration) { const r = e.currentTarget.getBoundingClientRect(); au.currentTime = (e.clientX - r.left) / r.width * au.duration; } };
+    el.list.append(li);
+  }
+  paint();
+}
+$('#clearAll').onclick = () => { if (files.length && confirm(t('confirm'))) { [...files].forEach(f => remove(f.id, true)); render(); } };
+
+/* ---------- ijro ---------- */
+function play(f) { if (cur !== f.id) { au.src = f.url; cur = f.id; } au.play().catch(() => {}); }
+function toggle(f) { cur === f.id && !au.paused ? au.pause() : play(f); }
+function paint() {
+  el.list.querySelectorAll('.file').forEach(li => {
+    const on = li.dataset.id === cur;
+    li.classList.toggle('on', on);
+    li.querySelector('.pb').innerHTML = svg(on && !au.paused && !au.ended ? 'pause' : 'play');
+    if (!on) li.querySelector('.bar').style.removeProperty('--p');
+  });
+  live();
+}
+['play', 'pause', 'ended', 'emptied'].forEach(ev => au.addEventListener(ev, paint));
+au.addEventListener('timeupdate', () => {
+  const li = el.list.querySelector(`[data-id="${cur}"]`);
+  if (!li || !au.duration) return;
+  li.querySelector('.bar').style.setProperty('--p', au.currentTime / au.duration * 100 + '%');
+  li.querySelector('.tm').textContent = fmt(au.currentTime) + ' / ' + fmt(au.duration);
+});
+
+/* ---------- boshlash ---------- */
+applyLang();
+(async () => {
+  const saved = (await db('readonly', s => s.getAll())) || [];
+  files = saved.sort((a, b) => b.ts - a.ts).map(f => ({ ...f, url: URL.createObjectURL(f.blob) }));
+  render();
+})();
+init();
+})();
+</script>
+</body>
+</html>
