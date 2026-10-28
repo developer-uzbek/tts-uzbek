@@ -39,9 +39,11 @@ ACTIVE = False
 
 VOICES = {
     "sardor": ("uz-UZ-SardorNeural", "🇺🇿 Sardor"), "madina": ("uz-UZ-MadinaNeural", "🇺🇿 Madina"),
-    "ahmet": ("tr-TR-AhmetNeural", "🇹🇷 Ahmet"), "emel": ("tr-TR-EmelNeural", "🇹🇷 Emel"),
+    "ahmet": ("tr-TR-AhmetNeural", "🇹🇷 Turkcha (erkak)"), "emel": ("tr-TR-EmelNeural", "🇹🇷 Emel"),
     "dmitry": ("ru-RU-DmitryNeural", "🇷🇺 Dmitry"), "svetlana": ("ru-RU-SvetlanaNeural", "🇷🇺 Svetlana"),
     "andrew": ("en-US-AndrewNeural", "🇺🇸 Andrew"), "aria": ("en-US-AriaNeural", "🇺🇸 Aria"),
+    # ko'p tilli ovozlar: matn tilini o'zi aniqlaydi (turkcha, o'zbekcha, ruscha... hammasini o'qiydi)
+    "andrewm": ("en-US-AndrewMultilingualNeural", "🌍 Andrew (ko'p tilli)"), "avam": ("en-US-AvaMultilingualNeural", "🌍 Ava (ko'p tilli)"),
 }
 
 bot = telebot.TeleBot(TOKEN or "0:none", parse_mode="HTML", num_threads=8)
@@ -271,7 +273,7 @@ def cmd_start(m):
 @bot.message_handler(commands=["voice"])
 def cmd_voice(m):
     if allowed(m.from_user.id, m.chat.id):
-        bot.send_message(m.chat.id, "🎙 Ovozni tanlang.\nMatn tiliga mos ovoz tanlang: 🇺🇿 o'zbekcha · 🇹🇷 turkcha · 🇷🇺 ruscha · 🇺🇸 inglizcha", reply_markup=voice_kb())
+        bot.send_message(m.chat.id, "🎙 Ovozni tanlang.\nMatn tiliga mos ovoz tanlang: 🇺🇿 o'zbekcha · 🇹🇷 turkcha · 🇷🇺 ruscha · 🇺🇸 inglizcha · 🌍 ko'p tilli (istalgan til)", reply_markup=voice_kb())
 
 
 @bot.callback_query_handler(func=lambda c: c.data == "chk")
@@ -398,16 +400,18 @@ def diag(chat):
         out.append(f"🤖 @{me.username} — inline: " + ("✅ yoqiq" if on else "❌ <b>O'CHIQ</b> → @BotFather → /setinline"))
     except Exception as exc:
         out.append(f"❌ getMe: {html.escape(str(exc)[:120])}")
+    if core.dead_voices():
+        out.append("↪️ Zaxiraga o'tgan ovozlar (Microsoft jim qaytarmoqda): " + ", ".join(v.split("-")[2].replace("Neural", "") for v in core.dead_voices()) + " → ko'p tilli ovoz ishlatilmoqda")
     out.append(f"🔎 Inline so'rovlar: kelgan <b>{INLINE['q']}</b>, javob berilgan <b>{INLINE['ok']}</b>"
                + (f"\n     oxirgi xato: <code>{html.escape(INLINE['err'])}</code>" if INLINE["err"] else ""))
     for key, (vid, name) in VOICES.items():
         t0 = time.time()
         try:
-            data = asyncio.run(core._run(SAMPLES.get(vid[:2], "Hello"), core.opts({"voice": vid})))
+            data = asyncio.run(core._run("Merhaba dünya" if "Multilingual" in vid else SAMPLES.get(vid[:2], "Hello"), core.opts({"voice": vid})))
             sample = sample or data
-            out.append(f"✅ {name} — {time.time() - t0:.1f} s, {len(data) // 1024} KB")
+            out.append(f"✅ {name} [{vid.split('-')[2][:-6]}] — {time.time() - t0:.1f} s, {len(data) // 1024} KB")
         except Exception as exc:
-            out.append(f"❌ {name} — <code>{html.escape(str(exc)[:150])}</code>")
+            out.append(f"❌ {name} [{vid.split('-')[2][:-6]}] — <code>{html.escape(str(exc)[:150])}</code>")
     target = storage_chat()
     if not target:
         out.append("⚠️ Saqlash chati yo'q (ADMIN_ID yoki STORAGE_CHAT_ID kerak) — inline havola rejimida ishlaydi")
