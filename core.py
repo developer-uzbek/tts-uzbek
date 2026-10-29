@@ -173,72 +173,57 @@ async def _run(text, o):
 
 
 # Microsoft'ning ko'p tilli ovozlari matn tilini o'zi aniqlaydi (turkcha, o'zbekcha, ruscha...).
-# Oddiy ovoz (masalan Ahmet) jim chiqsa, shu ovozlar zaxira bo'lib ishlaydi.
+# Faqat asl ovoz BARCHA urinishlarda jim chiqsagina zaxira sifatida ishlatiladi.
 MULTI = {"male": "en-US-AndrewMultilingualNeural", "female": "en-US-AvaMultilingualNeural"}
-SAMPLE = {"tr": "Merhaba", "uz": "Salom", "ru": "Привет", "kk": "Сәлем", "en": "Hello"}   # ovoz sog'ligini tekshirish uchun
-DEAD_TTL = 3600
-_dead = {}   # Microsoft hozir jim qaytarayotgan ovozlar: ovoz -> belgilangan vaqt (1 soatdan so'ng qayta tekshiriladi)
+
+
+class Audio(bytes):
+    """MP3 baytlari. .voice — haqiqatda ishlatilgan ovoz (zaxira bo'lsa, so'ralgan ovozdan farq qiladi)."""
+    voice = None
 
 
 def _silent(exc):
-    """Microsoft jim (bo'sh) audio qaytardi — ovoz bu matnni o'qiy olmadi."""
+    """Microsoft bo'sh (jim) audio qaytardi."""
     s = str(exc)
     return "No audio" in s or "bo'sh audio" in s
 
 
-def dead_voices():
-    now = time.time()
-    return [v for v, t in _dead.items() if now - t < DEAD_TTL]
-
-
-def _probe(o):
-    """Ovoz o'z tilidagi bitta so'zni ham o'qiy olmasa — ovozning o'zi buzilgan: 1 soatga zaxiraga o'tkaziladi."""
-    sample = SAMPLE.get(o["voice"][:2])
-    if not sample:
-        return
-    try:
-        asyncio.run(_run(sample, o))
-        _dead.pop(o["voice"], None)
-    except Exception as exc:
-        if _silent(exc):
-            _dead[o["voice"]] = time.time()
-            print(f"🚫 {o['voice']} Microsoft tomonida jim — {DEAD_TTL // 60} daqiqaga zaxira ovozga o'tkazildi", flush=True)
+def _store(key, data, voice):
+    audio = Audio(data)
+    audio.voice = voice
+    _put(key, audio)
+    return audio
 
 
 def synth(text, o, on_miss=None, tries=3):
-    """Matn -> MP3 bytes. Kesh bo'lsa darrov qaytadi; yo'q bo'lsa on_miss() (limit tekshiruvi) chaqiriladi.
-    Ovoz jim chiqsa (yoki yaqinda jim chiqqan bo'lsa), o'sha jinsdagi ko'p tilli ovozga o'tadi."""
+    """Matn -> MP3 (Audio). Kesh bo'lsa darrov qaytadi; yo'q bo'lsa on_miss() (limit tekshiruvi) chaqiriladi.
+    Microsoft ba'zan bo'sh javob beradi (ayniqsa turkcha Ahmet): 4 marta urinadi — avval so'ralgan sozlamalar bilan,
+    keyin tezlik/ton/balandliksiz (ba'zi ovozlar shularni qabul qilmaydi). Shundan so'nggina zaxira ovozga o'tadi."""
     key = (text, o["voice"], o["rate"], o["pitch"], o["volume"])
     hit = _get(key)
     if hit:
         return hit
     if on_miss:
         on_miss()
+    plain = {**o, "rate": "+0%", "pitch": "+0Hz", "volume": "+0%"}
+    attempts = [o, o, plain, plain] if tries >= 3 else [o] * tries
     last = None
     with JOBS:
-        primary = o["voice"] not in dead_voices()
-        for i in range(tries if primary else 0):
+        for i, opt in enumerate(attempts):
             try:
-                data = asyncio.run(_run(text, o))
-                _put(key, data)
-                return data
+                return _store(key, asyncio.run(_run(text, opt)), o["voice"])
             except Exception as exc:
                 last = exc
-                print(f"⚠️ TTS urinish {i + 1}/{tries} [{o['voice']}]: {type(exc).__name__}: {exc}", flush=True)
-                if _silent(exc) and i >= 1:          # takror urinish foyda bermaydi — zaxira ovozga o'tamiz
-                    break
-                if i < tries - 1:
-                    time.sleep(0.8 * (i + 1))
-        if (not primary or _silent(last)) and "Multilingual" not in o["voice"]:
+                print(f"⚠️ TTS urinish {i + 1}/{len(attempts)} [{o['voice']}]: {type(exc).__name__}: {exc}", flush=True)
+                if i < len(attempts) - 1:
+                    time.sleep(0.6 * (i + 1))
+        if _silent(last) and "Multilingual" not in o["voice"]:
             gender = next((x["gender"] for x in voices() if x["id"] == o["voice"]), "male")
             alt = {**o, "voice": MULTI[gender]}
             try:
-                data = asyncio.run(_run(text, alt))
-                _put(key, data)                      # asl kalit bilan keshlanadi: qayta so'rov darrov qaytadi
-                if primary:                          # ovoz buzilganmi yoki matn tilga mos kelmadimi — fonda tekshiramiz
-                    threading.Thread(target=_probe, args=(o,), daemon=True).start()
-                print(f"↪️ {o['voice']} o'rniga {alt['voice']} ishlatildi", flush=True)
-                return data
+                audio = _store(key, asyncio.run(_run(text, alt)), alt["voice"])   # asl kalit bilan keshlanadi
+                print(f"↪️ {o['voice']} {len(attempts)} urinishda jim qoldi — {alt['voice']} ishlatildi", flush=True)
+                return audio
             except Exception as exc:
                 last = exc
                 print(f"⚠️ Zaxira ovoz ham ishlamadi [{alt['voice']}]: {type(exc).__name__}: {exc}", flush=True)
