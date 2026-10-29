@@ -400,18 +400,22 @@ def diag(chat):
         out.append(f"🤖 @{me.username} — inline: " + ("✅ yoqiq" if on else "❌ <b>O'CHIQ</b> → @BotFather → /setinline"))
     except Exception as exc:
         out.append(f"❌ getMe: {html.escape(str(exc)[:120])}")
-    if core.dead_voices():
-        out.append("↪️ Zaxiraga o'tgan ovozlar (Microsoft jim qaytarmoqda): " + ", ".join(v.split("-")[2].replace("Neural", "") for v in core.dead_voices()) + " → ko'p tilli ovoz ishlatilmoqda")
     out.append(f"🔎 Inline so'rovlar: kelgan <b>{INLINE['q']}</b>, javob berilgan <b>{INLINE['ok']}</b>"
                + (f"\n     oxirgi xato: <code>{html.escape(INLINE['err'])}</code>" if INLINE["err"] else ""))
     for key, (vid, name) in VOICES.items():
-        t0 = time.time()
-        try:
-            data = asyncio.run(core._run("Merhaba dünya" if "Multilingual" in vid else SAMPLES.get(vid[:2], "Hello"), core.opts({"voice": vid})))
-            sample = sample or data
-            out.append(f"✅ {name} [{vid.split('-')[2][:-6]}] — {time.time() - t0:.1f} s, {len(data) // 1024} KB")
-        except Exception as exc:
-            out.append(f"❌ {name} [{vid.split('-')[2][:-6]}] — <code>{html.escape(str(exc)[:150])}</code>")
+        t0, tag = time.time(), vid.split("-")[2][:-6]
+        text = "Merhaba dünya" if "Multilingual" in vid else SAMPLES.get(vid[:2], "Hello")
+        for n in range(1, 4):                       # Microsoft ba'zan bo'sh javob beradi — 3 marta urinamiz
+            try:
+                data = asyncio.run(core._run(text, core.opts({"voice": vid})))
+                sample = sample or data
+                out.append(f"✅ {name} [{tag}] — {time.time() - t0:.1f} s, {len(data) // 1024} KB, {n}-urinishda")
+                break
+            except Exception as exc:
+                err = exc
+                time.sleep(0.5)
+        else:
+            out.append(f"❌ {name} [{tag}] — 3 urinish: <code>{html.escape(str(err)[:150])}</code>")
     target = storage_chat()
     if not target:
         out.append("⚠️ Saqlash chati yo'q (ADMIN_ID yoki STORAGE_CHAT_ID kerak) — inline havola rejimida ishlaydi")
@@ -570,7 +574,8 @@ def on_text(m):
         data = core.synth(text, core.opts({"voice": vid, "rate": "+10"}), on_miss=lambda: throttle(uid))
         f = io.BytesIO(data)
         f.name = "voice.mp3"
-        bot.send_voice(m.chat.id, f, caption=f"🎙 {vname}", reply_to_message_id=m.message_id)
+        same = getattr(data, "voice", vid) == vid   # zaxira ovoz ishlatilgan bo'lsa, foydalanuvchiga ochiq aytamiz
+        bot.send_voice(m.chat.id, f, caption=f"🎙 {vname}" if same else f"⚠️ {vname} ovozi hozir javob bermadi — o'rniga ko'p tilli ovoz ishlatildi. Qayta urinib ko'ring.", reply_to_message_id=m.message_id)
     except core.Busy as exc:
         bot.reply_to(m, f"⏳ {exc}")
     except Exception as exc:
@@ -617,11 +622,12 @@ def inline_audio(text, key, uid):
     """Matnni sintez qiladi. Natija: Telegram'dagi tayyor audio (CachedAudio); saqlash chati yo'q bo'lsa — /tts.mp3 havolasi."""
     vid, vname = VOICES.get(key, VOICES["sardor"])
     data = core.synth(text, core.opts({"voice": vid, "rate": "+10"}), on_miss=lambda: throttle(uid, 30, "inline"), tries=1)
+    perf = vname if getattr(data, "voice", vid) == vid else "🌍 ko'p tilli"
     rid = hashlib.md5(f"{vid}{text}".encode()).hexdigest()
     fid = FILE_IDS.get((text, vid))                 # bir xil matn: qayta yuklanmaydi
     if not fid:
         try:
-            fid = upload_audio(data, text, vname)
+            fid = upload_audio(data, text, perf)
         except Exception as exc:
             print(f"⚠️ Inline: audio yuklanmadi ({exc}) — havola rejimiga o'tildi", flush=True)
         if fid:
@@ -631,7 +637,7 @@ def inline_audio(text, key, uid):
     if fid:
         return types.InlineQueryResultCachedAudio(rid, fid, caption=f"@{BOT_USERNAME}")
     url = f"{APP_URL}/tts.mp3?" + urlencode({"q": text, "voice": vid, "rate": 10, "sig": core.sign(text, vid)}, quote_via=quote)
-    return types.InlineQueryResultAudio(rid, url, f"🔊 {short(text)}", caption=f"@{BOT_USERNAME}", performer=f"{vname} • TTS")
+    return types.InlineQueryResultAudio(rid, url, f"🔊 {short(text)}", caption=f"@{BOT_USERNAME}", performer=f"{perf} • TTS")
 
 
 def inline_work(q, text, reply):
