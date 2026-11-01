@@ -1,0 +1,30 @@
+# Uzbekcha TTS
+
+> Free Uzbek Text-to-Speech — Natural Uzbek AI Voice Generator
+
+## What is Uzbekcha TTS?
+
+Uzbekcha TTS is a free online service that converts Uzbek text into natural-sounding speech using AI neural voices. It generates downloadable MP3 audio files.
+
+## Quick Start
+
+Generate Uzbek speech:
+GET https://tts-uzbek.onrender.com/tts.mp3?q=Salom
+
+## API Endpoints
+
+- GET /tts.mp3?q=TEXT — Returns MP3 audio
+- POST /api/tts — Generate audio (JSON body: {"text": "...", "voice": "uz-UZ-SardorNeural"})
+- GET /api/voices — List available voices
+- GET /api/info — Service metadata
+
+## Available Uzbek Voices
+
+- uz-UZ-SardorNeural (Sardor, male)
+- uz-UZ-MadinaNeural (Madina, female)
+
+## Documentation
+
+- Full API docs: https://tts-uzbek.onrender.com/guide
+- AI integration guide: see llms-full.txt
+- GitHub: https://github.com/developer-uzbek/tts-uzbek

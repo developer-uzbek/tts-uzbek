@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: uzbekcha-tts
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: python combined_app.py
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: PUBLIC_BASE_URL
+        value: https://tts-uzbek.onrender.com
+      - key: BOT_USERNAME
+        value: Uzbekcha_tts_bot
+      - key: RATE_PER_MIN
+        value: "40"
+      - key: MAX_CHARS
+        value: "5000"
+      - key: CACHE_MB
+        value: "24"
+      - key: MAX_JOBS
+        value: "4"

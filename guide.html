@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="midnight">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uzbekcha TTS — Foydalanish Qo'llanmasi & API Documentation</title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    body { font-family: var(--font, sans-serif); background: #080a18; color: #e8eaff; padding: 24px; max-width: 960px; margin: 0 auto; line-height: 1.6; }
+    h1, h2, h3 { color: #8b90ff; }
+    code, pre { background: rgba(20,24,48,0.8); border: 1px solid rgba(148,163,255,0.2); border-radius: 8px; font-family: monospace; }
+    pre { padding: 16px; overflow-x: auto; }
+    code { padding: 2px 6px; }
+    .card { background: rgba(20,24,48,0.6); border: 1px solid rgba(148,163,255,0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    a { color: #6366f1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { border: 1px solid rgba(148,163,255,0.2); padding: 8px 12px; text-align: left; }
+    th { background: rgba(99,102,241,0.15); }
+  </style>
+</head>
+<body>
+  <h1>🎙️ Uzbekcha TTS — Qo'llanma & API Hujjatlari</h1>
+  <p><strong>Uzbekcha TTS</strong> — matnni tabiiy o'zbek nutqiga (MP3) aylantiruvchi bepul va ommaviy platforma.</p>
+
+  <div class="card">
+    <h2>1. Tezkor Havola (GET)</h2>
+    <p>Matndan to'g'ridan-to'g'ri MP3 olish:</p>
+    <pre><code>GET https://tts-uzbek.onrender.com/tts.mp3?q=Salom%20dunyo&voice=sardor</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>2. REST API (POST)</h2>
+    <pre><code>curl -X POST https://tts-uzbek.onrender.com/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Salom, dunyo!","voice":"uz-UZ-SardorNeural"}' \
+  -o audio.mp3</code></pre>
+  </div>
+
+  <div class="card" id="s2d">
+    <h2>3. Ovozlar va Sozlamalar (s2d)</h2>
+    <table>
+      <tr><th>Ovoz</th><th>Jins</th><th>Til</th><th>ID</th></tr>
+      <tr><td>Sardor</td><td>Erkak</td><td>O'zbek</td><td>uz-UZ-SardorNeural</td></tr>
+      <tr><td>Madina</td><td>Ayol</td><td>O'zbek</td><td>uz-UZ-MadinaNeural</td></tr>
+    </table>
+  </div>
+</body>
+</html>
