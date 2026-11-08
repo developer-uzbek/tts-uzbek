@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mening ovozim — Uzbekcha TTS</title>
+<meta name="description" content="O'z ovozingizni yozing va istalgan o'zbekcha matnni shu ovozda eshiting.">
+<link rel="stylesheet" href="/theme.css">
+<link rel="stylesheet" href="/clone.css">
+</head>
+<body>
+
+<header class="hd">
+  <a class="logo" href="/">
+    <svg viewBox="0 0 32 32" width="28" height="28" fill="none"><rect width="32" height="32" rx="8" fill="url(#g)"/><path d="M8 20 L12 12 L16 18 L20 10 L24 20" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs></svg>
+    <span>Uzbekcha TTS</span><em>/ Mening ovozim</em>
+  </a>
+  <div class="hd-right">
+    <span class="badge" id="engLite" title="Yengil rejim">Yengil: …</span>
+    <span class="badge" id="engNeural" title="Neyron rejim (OpenVoice)">Neyron: …</span>
+    <a class="btn ghost sm" href="/">← Oddiy TTS</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="intro">
+    <h1>O'z ovozingizda gapirtiring</h1>
+    <p>Ovozingizni 30–60 soniya yozing. Tizim <b>ohang, stil, uslub, tempo, pauza, energiya, yorqinlik, ovoz sifati va formantlarni</b>
+       o'rganadi, keyin istalgan matnni shu ovozga moslab o'qiydi.</p>
+  </section>
+
+  <!-- 1. YOZISH -->
+  <section class="card" id="step1">
+    <div class="card-h"><span class="num">1</span><h2>Ovozingizni yozing</h2></div>
+
+    <div class="reading" id="readingBox">
+      <div class="reading-t">Quyidagi matnni tabiiy ovozda, odatdagi tezlikda o'qing:</div>
+      <p id="readingText">Yuklanmoqda…</p>
+    </div>
+
+    <div class="rec">
+      <button class="rec-btn" id="recBtn" type="button" aria-label="Yozishni boshlash">
+        <span class="dot"></span><span id="recLabel">Yozishni boshlash</span>
+      </button>
+      <div class="rec-meter">
+        <canvas id="meter" width="420" height="46"></canvas>
+        <span class="timer" id="timer">0:00</span>
+      </div>
+      <label class="btn ghost sm file">
+        📁 Fayl yuklash
+        <input type="file" id="fileIn" accept="audio/*,video/webm" multiple hidden>
+      </label>
+    </div>
+
+    <div class="takes" id="takes"></div>
+    <div class="total" id="total">Jami: 0 soniya · tavsiya: 45–60 soniya</div>
+
+    <div class="row">
+      <label class="field grow">Profil nomi
+        <input type="text" id="pname" maxlength="40" value="Mening ovozim">
+      </label>
+    </div>
+
+    <label class="consent">
+      <input type="checkbox" id="consent">
+      <span>Bu <b>mening o'z ovozim</b> (yoki egasidan yozma ruxsat olganman). Boshqa odamning ovozini roziligisiz klonlamayman.</span>
+    </label>
+
+    <button class="btn primary" id="analyzeBtn" type="button" disabled>🧬 Ovoz DNK'sini tahlil qilish</button>
+    <div class="msg" id="msg1"></div>
+  </section>
+
+  <!-- 2. HISOBOT -->
+  <section class="card hidden" id="step2">
+    <div class="card-h"><span class="num">2</span><h2>Ovoz DNK'ngiz</h2></div>
+    <div class="chips" id="chips"></div>
+    <div class="warns" id="warns"></div>
+    <div class="grid" id="metrics"></div>
+    <div class="ref"><span>Tahlil qilingan yozuv:</span><audio id="refAudio" controls preload="none"></audio></div>
+  </section>
+
+  <!-- 3. SINTEZ -->
+  <section class="card" id="step3">
+    <div class="card-h"><span class="num">3</span><h2>Matn → mening ovozim</h2></div>
+
+    <div class="row">
+      <label class="field grow">Profil
+        <select id="profileSel"></select>
+      </label>
+      <button class="btn ghost sm" id="delBtn" type="button" title="Profilni o'chirish">🗑 O'chirish</button>
+    </div>
+
+    <label class="field">Matn
+      <textarea id="text" rows="5" maxlength="1500">Assalomu alaykum! Bu mening ovozimda o'qilgan matn. Ovoz klonlash juda qiziq texnologiya, shunday emasmi?</textarea>
+    </label>
+    <div class="count"><span id="cnt">0</span> / <span id="maxc">1500</span></div>
+
+    <div class="opts">
+      <label class="field">Dvigatel
+        <select id="engine">
+          <option value="auto">Avtomatik (eng yaxshisi)</option>
+          <option value="neural">Neyron (OpenVoice)</option>
+          <option value="lite">Yengil (tezkor)</option>
+        </select>
+      </label>
+      <label class="field">Asos ovoz
+        <select id="baseVoice">
+          <option value="">Avtomatik (jinsga qarab)</option>
+          <option value="uz-UZ-SardorNeural">Sardor (erkak)</option>
+          <option value="uz-UZ-MadinaNeural">Madina (ayol)</option>
+        </select>
+      </label>
+      <label class="field">Uslub kuchi (tempo, ohang, pauza) <b id="pv">100%</b>
+        <input type="range" id="prosody" min="0" max="120" value="100">
+      </label>
+      <label class="field">Tembr moslash kuchi <b id="mv">100%</b>
+        <input type="range" id="match" min="0" max="120" value="100">
+      </label>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="genBtn" type="button">▶ Mening ovozimda yaratish</button>
+      <button class="btn ghost" id="cmpBtn" type="button" title="Moslashtirilmagan oddiy Edge ovozi bilan solishtirish">⇄ Oddiy ovoz bilan solishtirish</button>
+    </div>
+    <div class="msg" id="msg3"></div>
+
+    <div class="result hidden" id="result">
+      <div class="res-row"><b>Mening ovozim</b><audio id="outAudio" controls></audio><a class="btn ghost sm" id="dl" download="mening_ovozim.mp3">⬇ Yuklab olish</a></div>
+      <div class="res-row hidden" id="plainRow"><b>Oddiy ovoz</b><audio id="plainAudio" controls></audio></div>
+      <div class="info" id="info"></div>
+    </div>
+  </section>
+
+  <section class="note">
+    <b>Eslatma:</b> natija mukammal klon emas — talaffuz Microsoft Neural ovozidan, tembr va uslub esa sizning yozuvingizdan olinadi.
+    Yozuv qancha toza va uzun bo'lsa, o'xshashlik shuncha yuqori. Ma'lumotlar faqat shu kompyuterdagi <code>voice_profiles/</code> papkasida saqlanadi.
+  </section>
+</main>
+
+<div class="toasts" id="toasts"></div>
+<script src="/clone.js"></script>
+</body>
+</html>

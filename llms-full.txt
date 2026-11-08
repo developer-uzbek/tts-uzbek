@@ -1,0 +1,255 @@
+# Uzbekcha TTS — Complete AI Integration Guide
+
+> Free Uzbek Text-to-Speech — Natural Uzbek AI Voice Generator
+> Website: https://tts-uzbek.onrender.com
+> GitHub: https://github.com/developer-uzbek/tts-uzbek
+
+## Service Overview
+
+Uzbekcha TTS converts text to natural speech using Microsoft Edge Neural TTS voices.
+Primary language: Uzbek. Also supports Russian, English, Turkish, and Kazakh.
+Output format: MP3 audio (audio/mpeg).
+No API key required. Free to use.
+
+## How to Generate Uzbek Audio
+
+### Method 1: Simple GET request (easiest)
+
+```
+GET https://tts-uzbek.onrender.com/tts.mp3?q=Salom%2C%20dunyo!
+```
+
+Returns: MP3 binary audio (Content-Type: audio/mpeg)
+
+### Method 2: POST with JSON body (recommended for AI agents)
+
+```
+POST https://tts-uzbek.onrender.com/api/tts
+Content-Type: application/json
+
+{
+  "text": "Salom, dunyo!",
+  "voice": "uz-UZ-SardorNeural"
+}
+```
+
+Returns: MP3 binary audio (Content-Type: audio/mpeg)
+
+### Method 3: GET with query parameters
+
+```
+GET https://tts-uzbek.onrender.com/api/tts?text=Salom&voice=uz-UZ-SardorNeural
+```
+
+Returns: MP3 binary audio (Content-Type: audio/mpeg)
+
+## Available Uzbek Voices
+
+| Voice ID | Name | Gender | Language |
+|---|---|---|---|
+| uz-UZ-SardorNeural | Sardor | male | Uzbek |
+| uz-UZ-MadinaNeural | Madina | female | Uzbek |
+
+Additional voices available:
+| Voice ID | Name | Gender | Language |
+|---|---|---|---|
+| ru-RU-DmitryNeural | Dmitry | male | Russian |
+| ru-RU-SvetlanaNeural | Svetlana | female | Russian |
+| en-US-AndrewNeural | Andrew | male | English |
+| en-US-AriaNeural | Aria | female | English |
+| tr-TR-AhmetNeural | Ahmet | male | Turkish |
+| tr-TR-EmelNeural | Emel | female | Turkish |
+| kk-KZ-DauletNeural | Daulet | male | Kazakh |
+| kk-KZ-AigulNeural | Aigul | female | Kazakh |
+
+Get full voice list: GET https://tts-uzbek.onrender.com/api/voices
+
+## Voice Selection Shortcuts
+
+Instead of using the full voice ID, you can use shortcuts:
+
+- By name: `"voice": "sardor"` or `"voice": "madina"`
+- By language: `"voice": "uz"` (defaults to male)
+- By language+gender: `"voice": "uz-female"` (selects Madina)
+- Separate params: `"lang": "uz", "gender": "female"`
+
+## Request Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| text (or q, r) | string | Yes | Text to convert to speech (max 5000 characters) |
+| voice (or v) | string | No | Voice ID, name, or shortcut. Default: uz-UZ-SardorNeural |
+| lang | string | No | Language code: uz, ru, en, tr, kk |
+| gender | string | No | male or female |
+| style | string | No | natural, deep, chipmunk, hype, calm. Default: natural |
+| rate | integer | No | Speed adjustment, -50 to 100. Default: 0 |
+| pitch | integer | No | Pitch adjustment, -50 to 50. Default: 0 |
+| volume | integer | No | Volume adjustment. Default: 0 |
+| dl | string | No | Set to "1" to force download (Content-Disposition: attachment) |
+| name | string | No | Custom filename (without .mp3 extension) |
+
+## Voice Styles
+
+| Style | Description | Speed | Pitch | Volume |
+|---|---|---|---|---|
+| natural | Natural, default | 0 | 0 | 0 |
+| deep | Deep and heavy | -20% | -40 Hz | +10% |
+| chipmunk | High-pitched and fast | +25% | +55 Hz | 0 |
+| hype | Energetic, fast, loud | +45% | +8 Hz | +20% |
+| calm | Slow and soft | -35% | -8 Hz | -35% |
+
+## Complete Python Example
+
+```python
+import requests
+
+# Generate Uzbek speech
+response = requests.post(
+    "https://tts-uzbek.onrender.com/api/tts",
+    json={
+        "text": "Assalomu alaykum! Uzbekcha TTS xizmatiga xush kelibsiz.",
+        "voice": "uz-UZ-SardorNeural",
+        "style": "natural",
+        "rate": 0,
+        "pitch": 0
+    }
+)
+
+# Verify the response is valid audio
+if response.status_code == 200 and response.headers.get("Content-Type") == "audio/mpeg":
+    # Save the MP3 file
+    filename = "uzbekcha-tts-output.mp3"
+    with open(filename, "wb") as f:
+        f.write(response.content)
+    print(f"Audio saved: {filename} ({len(response.content)} bytes)")
+else:
+    print(f"Error: HTTP {response.status_code}")
+    if response.headers.get("Content-Type", "").startswith("application/json"):
+        print(response.json().get("message", "Unknown error"))
+```
+
+## Complete JavaScript Example (Node.js)
+
+```javascript
+const fs = require('fs');
+const https = require('https');
+
+const data = JSON.stringify({
+    text: "Assalomu alaykum! Uzbekcha TTS xizmatiga xush kelibsiz.",
+    voice: "uz-UZ-SardorNeural"
+});
+
+const options = {
+    hostname: 'tts-uzbek.onrender.com',
+    path: '/api/tts',
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+    }
+};
+
+const req = https.request(options, (res) => {
+    if (res.statusCode === 200) {
+        const chunks = [];
+        res.on('data', chunk => chunks.push(chunk));
+        res.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            fs.writeFileSync('uzbekcha-tts-output.mp3', buffer);
+            console.log(`Audio saved: ${buffer.length} bytes`);
+        });
+    } else {
+        console.error(`Error: HTTP ${res.statusCode}`);
+    }
+});
+
+req.write(data);
+req.end();
+```
+
+## cURL Examples
+
+```bash
+# Simple GET — generate and save Uzbek audio
+curl "https://tts-uzbek.onrender.com/tts.mp3?q=Salom%2C%20dunyo!" -o uzbekcha-tts-output.mp3
+
+# POST with JSON — recommended method
+curl -X POST https://tts-uzbek.onrender.com/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Salom, dunyo!","voice":"uz-UZ-SardorNeural"}' \
+  -o uzbekcha-tts-output.mp3
+
+# Female voice
+curl -X POST https://tts-uzbek.onrender.com/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Salom, dunyo!","voice":"uz-UZ-MadinaNeural"}' \
+  -o uzbekcha-tts-output.mp3
+
+# With style
+curl -X POST https://tts-uzbek.onrender.com/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Salom!","voice":"sardor","style":"deep","rate":10}' \
+  -o uzbekcha-tts-output.mp3
+
+# List voices
+curl https://tts-uzbek.onrender.com/api/voices | python -m json.tool
+```
+
+## Error Handling
+
+| HTTP Status | Meaning | What to do |
+|---|---|---|
+| 200 | Success | Response body is MP3 audio |
+| 400 | Bad request | Check text and parameters |
+| 413 | Text too long | Split text into chunks of max 5000 characters |
+| 429 | Rate limited | Wait 10 seconds and retry |
+| 502 | TTS engine error | Retry after a few seconds |
+
+Error response format (JSON):
+```json
+{
+  "status": "error",
+  "message": "Description of the error"
+}
+```
+
+## Rate Limits
+
+- 40 new text requests per minute per IP address
+- Cached requests (same text + voice) do not count toward the limit
+- When rate limited, the response includes a Retry-After header
+
+## How to Verify Audio is Valid
+
+1. Check HTTP status is 200
+2. Check Content-Type header is "audio/mpeg"
+3. Check response body is not empty
+4. Check response body starts with bytes that indicate MP3 format (ID3 header or FF FB/FF F3 sync bytes)
+
+## Important Notes for AI Assistants
+
+1. The API returns BINARY AUDIO DATA, not a URL or text.
+2. To deliver audio to a user, you must:
+   a. Make the HTTP request to generate the audio
+   b. Save the binary response to a file
+   c. Attach the file to your response (if your platform supports file attachments)
+   d. OR provide a direct download URL: https://tts-uzbek.onrender.com/tts.mp3?q=URL_ENCODED_TEXT
+3. A URL alone is NOT an audio file. You must actually download the audio binary.
+4. If your platform does not support file attachments, provide the download URL and explain that the user needs to open it.
+5. Do not fabricate or hallucinate file attachments. Only attach files you have actually downloaded and saved.
+6. The Render free tier may have cold start delays (up to 30 seconds). If the first request times out, try again.
+
+## Service Metadata
+
+GET https://tts-uzbek.onrender.com/api/info
+
+Returns JSON with service description, endpoints, and usage examples.
+
+## Discovery Files
+
+- /llms.txt — Brief service description for LLM crawlers
+- /llms-full.txt — This complete guide
+- /ai-plugin.json — OpenAI plugin manifest
+- /openapi.yaml — OpenAPI 3.0 specification
+- /robots.txt — Crawler directives
+- /sitemap.xml — Sitemap

@@ -1,0 +1,10 @@
+# Ovoz klonlash — NEYRON rejim (OpenVoice V2). Avval requirements-clone.txt ni o'rnating.
+# Keyin OpenVoice'ni --no-deps bilan o'rnating (u eski versiyalarni majburlaydi):
+#   pip install --no-deps git+https://github.com/myshell-ai/OpenVoice.git
+torch
+unidecode
+inflect
+eng_to_ipa
+pypinyin
+cn2an
+jieba

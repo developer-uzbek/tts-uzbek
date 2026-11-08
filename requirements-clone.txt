@@ -1,0 +1,7 @@
+# Ovoz klonlash — YENGIL rejim (darhol ishlaydi)
+-r requirements.txt
+numpy
+scipy
+librosa>=0.10
+soundfile
+praat-parselmouth>=0.4.3

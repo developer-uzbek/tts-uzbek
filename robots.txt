@@ -1,0 +1,49 @@
+# Uzbekcha TTS — robots.txt
+# Website: https://tts-uzbek.onrender.com
+# GitHub: https://github.com/developer-uzbek/tts-uzbek
+
+User-agent: *
+Allow: /
+Allow: /guide
+Allow: /api/voices
+Allow: /api/info
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai-plugin.json
+Allow: /openapi.yaml
+Allow: /sitemap.xml
+
+# Do not crawl TTS audio generation endpoints (they produce binary audio, not pages)
+Disallow: /tts.mp3
+Disallow: /api/tts
+Disallow: /api/tts/quick
+
+Sitemap: https://tts-uzbek.onrender.com/sitemap.xml
+
+# AI assistants and LLM crawlers
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai-plugin.json
+Allow: /openapi.yaml
+Allow: /api/voices
+Allow: /api/info
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /

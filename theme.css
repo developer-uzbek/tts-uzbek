@@ -1,0 +1,23 @@
+/* Uzbekcha TTS — Shared Theme & Styling Variables */
+:root, [data-theme=midnight] {
+  --tc: #080a18;
+  --bg: radial-gradient(60rem 38rem at 8% -12%, rgba(99, 102, 241, 0.22), transparent 62%), radial-gradient(50rem 34rem at 100% 0, rgba(124, 58, 237, 0.14), transparent 60%), #080a18;
+  --solid: #12162e;
+  --card: rgba(20, 24, 48, 0.62);
+  --field: rgba(8, 10, 26, 0.62);
+  --bd: rgba(148, 163, 255, 0.14);
+  --bw: 1px;
+  --cbw: 1px;
+  --text: #e8eaff;
+  --mut: #8a91b8;
+  --a: #6366f1;
+  --a2: #7c3aed;
+  --at: #8b90ff;
+  --on: #fff;
+  --btn: linear-gradient(135deg, #6366f1, #7c3aed);
+  --r: 18px;
+  --rs: 12px;
+  --rb: 15px;
+  --blur: 14px;
+  --font: Inter, system-ui, -apple-system, sans-serif;
+}

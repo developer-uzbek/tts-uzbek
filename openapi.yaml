@@ -1,0 +1,353 @@
+openapi: "3.0.3"
+info:
+  title: Uzbekcha TTS API
+  description: |
+    Free Uzbek Text-to-Speech API — Convert text to natural speech using AI neural voices.
+    Primary language: Uzbek. Also supports Russian, English, Turkish, and Kazakh.
+    No API key required.
+  version: "2.0.0"
+  contact:
+    url: https://github.com/developer-uzbek/tts-uzbek
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://tts-uzbek.onrender.com
+    description: Production server
+
+paths:
+  /tts.mp3:
+    get:
+      operationId: generateMp3
+      summary: Generate MP3 audio from text
+      description: |
+        Convert text to speech and return MP3 audio binary.
+        This is the simplest endpoint — just pass text as a query parameter.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Text to convert to speech (max 5000 characters)
+          schema:
+            type: string
+            maxLength: 5000
+            example: Salom, dunyo!
+        - name: voice
+          in: query
+          description: "Voice ID, name, or shortcut. Examples: uz-UZ-SardorNeural, sardor, madina, uz, uz-female"
+          schema:
+            type: string
+            default: uz-UZ-SardorNeural
+        - name: lang
+          in: query
+          description: "Language code: uz, ru, en, tr, kk"
+          schema:
+            type: string
+        - name: gender
+          in: query
+          description: "Gender: male or female"
+          schema:
+            type: string
+            enum: [male, female]
+        - name: style
+          in: query
+          description: Voice style
+          schema:
+            type: string
+            enum: [natural, deep, chipmunk, hype, calm]
+            default: natural
+        - name: rate
+          in: query
+          description: "Speed adjustment (-50 to 100)"
+          schema:
+            type: integer
+            default: 0
+        - name: pitch
+          in: query
+          description: "Pitch adjustment in Hz (-50 to 50)"
+          schema:
+            type: integer
+            default: 0
+        - name: dl
+          in: query
+          description: "Set to 1 to force browser download"
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Custom filename (without .mp3 extension)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: MP3 audio binary
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Bad request (missing text, invalid voice/style)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "413":
+          description: Text too long
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Rate limited
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                example: 10
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/tts:
+    get:
+      operationId: apiTtsGet
+      summary: Generate TTS audio via GET
+      description: Same as /tts.mp3 but also accepts text parameter name
+      parameters:
+        - name: text
+          in: query
+          required: true
+          description: Text to convert (max 5000 characters)
+          schema:
+            type: string
+        - name: voice
+          in: query
+          schema:
+            type: string
+            default: uz-UZ-SardorNeural
+        - name: style
+          in: query
+          schema:
+            type: string
+            default: natural
+        - name: rate
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: pitch
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: MP3 audio
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      operationId: apiTtsPost
+      summary: Generate TTS audio via POST (recommended)
+      description: |
+        Convert text to speech. Accepts JSON body with text and voice parameters.
+        Returns MP3 binary audio.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Text to convert (max 5000 characters)
+                  maxLength: 5000
+                  example: Salom, dunyo!
+                voice:
+                  type: string
+                  description: Voice ID or shortcut
+                  default: uz-UZ-SardorNeural
+                  example: uz-UZ-SardorNeural
+                lang:
+                  type: string
+                  description: Language code
+                  example: uz
+                gender:
+                  type: string
+                  description: Gender preference
+                  enum: [male, female]
+                style:
+                  type: string
+                  description: Voice style
+                  enum: [natural, deep, chipmunk, hype, calm]
+                  default: natural
+                rate:
+                  type: integer
+                  description: Speed (-50 to 100)
+                  default: 0
+                pitch:
+                  type: integer
+                  description: Pitch Hz (-50 to 50)
+                  default: 0
+                volume:
+                  type: integer
+                  description: Volume adjustment
+                  default: 0
+      responses:
+        "200":
+          description: MP3 audio binary
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "413":
+          description: Text too long (max 5000 chars)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: TTS engine error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/voices:
+    get:
+      operationId: listVoices
+      summary: List available voices and styles
+      description: Returns all available voices grouped by language, and available voice styles.
+      responses:
+        "200":
+          description: Voice list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  service:
+                    type: string
+                    example: Uzbekcha TTS
+                  max_chars:
+                    type: integer
+                    example: 5000
+                  voices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: uz-UZ-SardorNeural
+                        name:
+                          type: string
+                          example: Sardor
+                        lang:
+                          type: string
+                          example: uz-UZ
+                        gender:
+                          type: string
+                          example: male
+                  styles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: natural
+                        name:
+                          type: string
+                          example: Tabiiy
+
+  /api/info:
+    get:
+      operationId: getServiceInfo
+      summary: Service information and metadata
+      description: Returns service description, available endpoints, and usage examples. Useful for AI agents discovering the service.
+      responses:
+        "200":
+          description: Service metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service:
+                    type: string
+                  description:
+                    type: string
+                  version:
+                    type: string
+                  website:
+                    type: string
+                  endpoints:
+                    type: object
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  uptime_seconds:
+                    type: integer
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Text is required
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: Too many requests
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            example: 10
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

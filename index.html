@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="midnight">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uzbekcha TTS — Bepul O'zbekcha Matnni Ovozga Aylantirish | Free Uzbek Text-to-Speech</title>
+<meta name="description" content="Uzbekcha TTS — bepul va tabiiy o'zbek nutq sintezi. Matnni ovozga aylantiring, MP3 yuklab oling. Free Uzbek AI Text-to-Speech with natural neural voices. Generate Uzbek speech online.">
+<meta name="keywords" content="uzbek tts, uzbekcha tts, uzbek text to speech, o'zbekcha matnni ovozga aylantirish, uzbek voice generator, uzbek ai voice, free uzbek tts, uzbek speech synthesis, matndan ovoz yaratish, o'zbekcha ovoz generatori">
+<link rel="canonical" href="https://tts-uzbek.onrender.com/">
+<meta property="og:title" content="Uzbekcha TTS — Free Uzbek Text-to-Speech">
+<meta property="og:description" content="Generate natural Uzbek speech from text. Free AI-powered TTS with downloadable MP3 files.">
+<meta property="og:url" content="https://tts-uzbek.onrender.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Uzbekcha TTS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Uzbekcha TTS — Free Uzbek Text-to-Speech">
+<meta name="twitter:description" content="Generate natural Uzbek speech from text. Free AI-powered TTS with downloadable MP3.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"Uzbekcha TTS",
+  "alternateName":"Uzbek Text-to-Speech",
+  "description":"Free Uzbek Text-to-Speech — Natural Uzbek AI Voice Generator. Convert Uzbek text to speech and download MP3.",
+  "url":"https://tts-uzbek.onrender.com/",
+  "applicationCategory":"MultimediaApplication",
+  "operatingSystem":"Any",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "inLanguage":["uz","ru","en","tr","kk"],
+  "browserRequirements":"Requires a modern web browser"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"What is Uzbekcha TTS?","acceptedAnswer":{"@type":"Answer","text":"Uzbekcha TTS is a free online text-to-speech service that converts Uzbek text into natural-sounding speech using AI neural voices. You can generate and download MP3 audio files."}},
+    {"@type":"Question","name":"How to convert Uzbek text to speech?","acceptedAnswer":{"@type":"Answer","text":"Enter your Uzbek text, select a voice (Sardor for male, Madina for female), and click Generate. You can play the audio directly or download it as MP3."}},
+    {"@type":"Question","name":"Is Uzbekcha TTS free?","acceptedAnswer":{"@type":"Answer","text":"Yes, Uzbekcha TTS is completely free to use. No registration or API key required."}},
+    {"@type":"Question","name":"What languages are supported?","acceptedAnswer":{"@type":"Answer","text":"The primary language is Uzbek with voices Sardor (male) and Madina (female). Russian, English, Turkish, and Kazakh voices are also available."}},
+    {"@type":"Question","name":"How to use Uzbekcha TTS API?","acceptedAnswer":{"@type":"Answer","text":"Send a POST request to /api/tts with JSON body containing text and voice parameters. The response is an MP3 audio file. See the API documentation for details."}}
+  ]
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--font:'Inter',system-ui,sans-serif}
+[data-theme="midnight"]{--bg:#0a0a1a;--surface:#12122a;--surface2:#1a1a3a;--border:#2a2a4a;--text:#e8e8f0;--text2:#9898b8;--accent:#6366f1;--accent2:#7c3aed;--accent-glow:rgba(99,102,241,.15);--danger:#ef4444;--success:#22c55e;--toast-bg:#1e1e3e}
+[data-theme="paper"]{--bg:#faf8f5;--surface:#fff;--surface2:#f0ede8;--border:#d8d4cc;--text:#1a1a1a;--text2:#6b6560;--accent:#6366f1;--accent2:#7c3aed;--accent-glow:rgba(99,102,241,.1);--danger:#dc2626;--success:#16a34a;--toast-bg:#fff}
+[data-theme="terminal"]{--bg:#0a0f0a;--surface:#0f170f;--surface2:#152015;--border:#1e3a1e;--text:#33ff33;--text2:#20aa20;--accent:#33ff33;--accent2:#20cc20;--accent-glow:rgba(51,255,51,.1);--danger:#ff3333;--success:#33ff33;--toast-bg:#0f170f}
+[data-theme="brutal"]{--bg:#fffbe6;--surface:#fff;--surface2:#fffbe6;--border:#1a1a1a;--text:#1a1a1a;--text2:#444;--accent:#ff5722;--accent2:#e91e63;--accent-glow:rgba(255,87,34,.1);--danger:#d32f2f;--success:#388e3c;--toast-bg:#fff}
+[data-theme="sakura"]{--bg:#1a0a14;--surface:#241020;--surface2:#2e162a;--border:#4a2040;--text:#f8e0f0;--text2:#c090b0;--accent:#f472b6;--accent2:#ec4899;--accent-glow:rgba(244,114,182,.12);--danger:#fb7185;--success:#4ade80;--toast-bg:#2e162a}
+[data-theme="sunset"]{--bg:#1a0f08;--surface:#241810;--surface2:#2e2018;--border:#4a3020;--text:#f8e8d8;--text2:#c0a080;--accent:#f59e0b;--accent2:#ef4444;--accent-glow:rgba(245,158,11,.12);--danger:#ef4444;--success:#22c55e;--toast-bg:#2e2018}
+
+html{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100%;display:flex;flex-direction:column;transition:background .3s,color .3s;line-height:1.5}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:var(--font);color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%239898b8' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;gap:8px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.15rem}
+.logo svg{width:28px;height:28px}
+.header-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hdr-btn{display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;font-size:.8rem;font-weight:500;background:var(--surface2);border:1px solid var(--border);transition:background .2s}
+.hdr-btn:hover{background:var(--accent-glow)}
+.hdr-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.main{display:flex;flex:1;overflow:hidden}
+.col{flex:1;display:flex;flex-direction:column;padding:16px;gap:12px;overflow-y:auto}
+.col-input{max-width:55%;border-right:1px solid var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card-title{font-size:.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+
+textarea#textInput{flex:1;min-height:180px;resize:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:.95rem;line-height:1.6}
+.text-meta{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--text2)}
+.text-actions{display:flex;gap:6px}
+.sm-btn{padding:5px 10px;border-radius:6px;font-size:.75rem;font-weight:500;background:var(--surface2);border:1px solid var(--border);transition:background .2s}
+.sm-btn:hover{background:var(--accent-glow)}
+
+.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ctrl-group{display:flex;flex-direction:column;gap:4px}
+.ctrl-group label{font-size:.75rem;font-weight:600;color:var(--text2)}
+.ctrl-group select,.ctrl-group input{font-size:.85rem}
+.slider-wrap{display:flex;align-items:center;gap:8px}
+.slider-wrap input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+.slider-val{font-size:.75rem;color:var(--accent);font-weight:600;min-width:32px;text-align:right}
+
+.gen-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;font-size:.95rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:opacity .2s,transform .1s;width:100%}
+.gen-btn:hover{opacity:.9}.gen-btn:active{transform:scale(.98)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+.gen-btn .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.files-card{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.files-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px}
+.files-list::-webkit-scrollbar{width:4px}.files-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.file-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.file-top{display:flex;align-items:center;gap:8px}
+.play-btn{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .2s}
+.play-btn:hover{opacity:.8}
+.play-btn svg{width:16px;height:16px}
+.file-info{flex:1;min-width:0}
+.file-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-detail{font-size:.7rem;color:var(--text2)}
+.file-actions{display:flex;gap:4px}
+.file-actions button{padding:5px 7px;border-radius:6px;background:var(--surface);border:1px solid var(--border);transition:background .2s}
+.file-actions button:hover{background:var(--accent-glow)}
+.file-actions button svg{width:14px;height:14px}
+.progress-bar{height:4px;background:var(--border);border-radius:4px;cursor:pointer;position:relative}
+.progress-fill{height:100%;background:var(--accent);border-radius:4px;width:0;transition:width .1s linear}
+
+.footer-links{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;padding-top:8px;border-top:1px solid var(--border);margin-top:auto}
+.footer-links a{display:flex;align-items:center;gap:4px;color:var(--text2)}
+.footer-links a:hover{color:var(--accent)}
+
+.toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:999;pointer-events:none}
+.toast{padding:10px 16px;border-radius:10px;background:var(--toast-bg);border:1px solid var(--border);font-size:.82rem;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.3);animation:toastIn .3s ease;pointer-events:auto}
+.toast.error{border-color:var(--danger)}.toast.success{border-color:var(--success)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px;color:var(--text2);text-align:center;flex:1}
+.empty-state svg{width:48px;height:48px;opacity:.4}
+.empty-state p{font-size:.85rem}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0s!important;transition-duration:0s!important}}
+
+@media(max-width:900px){
+  .main{flex-direction:column;overflow-y:auto}
+  .col-input{max-width:100%;border-right:none;border-bottom:1px solid var(--border)}
+  .col{overflow-y:visible}
+  textarea#textInput{min-height:120px}
+}
+@media(min-width:901px) and (min-height:621px){
+  body{height:100vh;overflow:hidden}
+  .col{overflow-y:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="url(#lg)"/><path d="M8 20 L12 12 L16 18 L20 10 L24 20" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="22" r="2" fill="#fff" opacity=".6"/><defs><linearGradient id="lg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs></svg>
+    <span>Uzbekcha TTS</span>
+  </div>
+  <div class="header-controls">
+    <a class="hdr-btn" href="/clone" title="O'z ovozingizda gapirtirish" style="text-decoration:none;color:inherit">🧬 Mening ovozim</a>
+    <button class="hdr-btn lang-btn active" data-lang="uz">O'zbekcha</button>
+    <button class="hdr-btn lang-btn" data-lang="ru">Русский</button>
+    <button class="hdr-btn lang-btn" data-lang="en">English</button>
+    <div style="width:1px;height:20px;background:var(--border);margin:0 2px"></div>
+    <button class="hdr-btn" id="themeBtn" title="Theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="main">
+  <div class="col col-input">
+    <div class="card" style="flex:1;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="card-title" data-i18n="inputTitle">Matn kiriting</span>
+        <div class="text-actions">
+          <button class="sm-btn" id="sampleBtn" data-i18n="sample">Namuna</button>
+          <button class="sm-btn" id="clearTextBtn" data-i18n="clear">Tozalash</button>
+        </div>
+      </div>
+      <textarea id="textInput" placeholder="Matnni shu yerga yozing..." data-i18n-placeholder="textPlaceholder"></textarea>
+      <div class="text-meta">
+        <span id="charCount">0 belgi · 0 so'z</span>
+        <span style="font-size:.7rem;color:var(--text2)">Ctrl+Enter</span>
+      </div>
+
+      <div class="controls-grid">
+        <div class="ctrl-group">
+          <label data-i18n="voiceLabel">Ovoz</label>
+          <select id="voiceSelect"><option>Yuklanmoqda...</option></select>
+        </div>
+        <div class="ctrl-group">
+          <label data-i18n="styleLabel">Uslub</label>
+          <select id="styleSelect">
+            <option value="natural">Natural</option>
+            <option value="deep">Deep</option>
+            <option value="chipmunk">Chipmunk</option>
+            <option value="hype">Hype</option>
+            <option value="calm">Calm</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label data-i18n="speedLabel">Tezlik</label>
+          <div class="slider-wrap">
+            <input type="range" id="speedRange" min="0.5" max="2" step="0.1" value="1">
+            <span class="slider-val" id="speedVal">1.0x</span>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label data-i18n="pitchLabel">Balandlik</label>
+          <div class="slider-wrap">
+            <input type="range" id="pitchRange" min="0.5" max="1.5" step="0.05" value="1">
+            <span class="slider-val" id="pitchVal">1.0</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="gen-btn" id="genBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5,3 19,12 5,21"/></svg>
+        <span data-i18n="generate">Ovoz yaratish</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="col col-output">
+    <div class="card files-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="card-title" data-i18n="filesTitle">Yaratilgan fayllar</span>
+        <button class="sm-btn" id="clearAllBtn" data-i18n="clearAll">Hammasini tozalash</button>
+      </div>
+      <div class="files-list" id="filesList">
+        <div class="empty-state" id="emptyState">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <p data-i18n="emptyText">Hali hech qanday fayl yaratilmagan</p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="/?q=Salom" title="Quick test">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>API snippet</span>
+        </a>
+        <a href="https://t.me/Uzbekcha_tts_bot" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 5L2 12.5l7 1.5M21 5l-5 15-6-8.5M21 5L9 14"/></svg>
+          <span>Telegram bot</span>
+        </a>
+        <a href="/guide">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span data-i18n="apiDocs">API hujjatlari</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-container" id="toasts"></div>
+
+<div id="themeMenu" style="display:none;position:fixed;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+  <button class="hdr-btn" data-theme="midnight" style="width:100%;justify-content:flex-start;margin-bottom:2px">🌙 Midnight</button>
+  <button class="hdr-btn" data-theme="paper" style="width:100%;justify-content:flex-start;margin-bottom:2px">📄 Paper</button>
+  <button class="hdr-btn" data-theme="terminal" style="width:100%;justify-content:flex-start;margin-bottom:2px">💻 Terminal</button>
+  <button class="hdr-btn" data-theme="brutal" style="width:100%;justify-content:flex-start;margin-bottom:2px">🔥 Brutal</button>
+  <button class="hdr-btn" data-theme="sakura" style="width:100%;justify-content:flex-start;margin-bottom:2px">🌸 Sakura</button>
+  <button class="hdr-btn" data-theme="sunset" style="width:100%;justify-content:flex-start">🌅 Sunset</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+const THEMES=["midnight","paper","terminal","brutal","sakura","sunset"];
+const SAMPLES={uz:"Uzbekcha TTS yordamida matnlaringizni yuqori sifatli va tabiiy ovozga aylantirishingiz hamda MP3 ko'rinishida yuklab olishingiz mumkin. Xush kelibsiz!",ru:"С помощью Uzbekcha TTS вы можете превратить любой текст в естественную речь и скачать её в формате MP3. Добро пожаловать!",tr:"Uzbekcha TTS ile metinlerinizi doğal bir sese dönüştürebilir ve MP3 olarak indirebilirsiniz. Hoş geldiniz!",en:"With Uzbekcha TTS you can turn any text into natural speech and download it as an MP3. Welcome!"};
+const I18N={
+  uz:{inputTitle:"Matn kiriting",sample:"Namuna",clear:"Tozalash",textPlaceholder:"Matnni shu yerga yozing...",voiceLabel:"Ovoz",styleLabel:"Uslub",speedLabel:"Tezlik",pitchLabel:"Balandlik",generate:"Ovoz yaratish",filesTitle:"Yaratilgan fayllar",clearAll:"Hammasini tozalash",emptyText:"Hali hech qanday fayl yaratilmagan",apiDocs:"API hujjatlari",charUnit:"belgi",wordUnit:"so'z",generating:"Yaratilmoqda...",cancel:"Bekor qilish",downloaded:"Yuklab olindi",copied:"Havola nusxalandi",deleted:"O'chirildi",cleared:"Hammasi tozalandi",rateLimited:"Iltimos, biroz kuting",errorGen:"Xatolik yuz berdi",noText:"Matn kiriting",filePre:"Ovoz"},
+  ru:{inputTitle:"Введите текст",sample:"Пример",clear:"Очистить",textPlaceholder:"Введите текст здесь...",voiceLabel:"Голос",styleLabel:"Стиль",speedLabel:"Скорость",pitchLabel:"Высота",generate:"Создать озвучку",filesTitle:"Созданные файлы",clearAll:"Очистить всё",emptyText:"Файлы ещё не созданы",apiDocs:"Документация API",charUnit:"символов",wordUnit:"слов",generating:"Генерация...",cancel:"Отмена",downloaded:"Скачано",copied:"Ссылка скопирована",deleted:"Удалено",cleared:"Всё очищено",rateLimited:"Подождите немного",errorGen:"Ошибка генерации",noText:"Введите текст",filePre:"Голос"},
+  en:{inputTitle:"Enter text",sample:"Sample",clear:"Clear",textPlaceholder:"Type your text here...",voiceLabel:"Voice",styleLabel:"Style",speedLabel:"Speed",pitchLabel:"Pitch",generate:"Generate Voice",filesTitle:"Generated files",clearAll:"Clear all",emptyText:"No files generated yet",apiDocs:"API Docs",charUnit:"chars",wordUnit:"words",generating:"Generating...",cancel:"Cancel",downloaded:"Downloaded",copied:"Link copied",deleted:"Deleted",cleared:"All cleared",rateLimited:"Rate limited, please wait",errorGen:"Generation error",noText:"Enter some text",filePre:"Voice"}
+};
+
+let currentLang="uz",files=[],currentAudio=null,currentPlayingId=null,abortController=null,db=null;
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const textInput=$("#textInput"),voiceSelect=$("#voiceSelect"),styleSelect=$("#styleSelect"),speedRange=$("#speedRange"),pitchRange=$("#pitchRange"),genBtn=$("#genBtn"),filesList=$("#filesList"),emptyState=$("#emptyState"),charCount=$("#charCount"),speedVal=$("#speedVal"),pitchVal=$("#pitchVal");
+
+function t(key){return(I18N[currentLang]||I18N.uz)[key]||key}
+function applyI18n(){
+  $$("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");const v=t(k);if(v)el.textContent=v});
+  $$("[data-i18n-placeholder]").forEach(el=>{const k=el.getAttribute("data-i18n-placeholder");const v=t(k);if(v)el.placeholder=v});
+  updateCharCount();
+}
+function setLang(lang){
+  currentLang=lang;
+  $$(".lang-btn").forEach(b=>b.classList.toggle("active",b.dataset.lang===lang));
+  applyI18n();
+  localStorage.setItem("utts_lang",lang);
+}
+
+function setTheme(theme){
+  document.documentElement.setAttribute("data-theme",theme);
+  localStorage.setItem("utts_theme",theme);
+  $("#themeMenu").style.display="none";
+}
+$("#themeBtn").addEventListener("click",e=>{
+  const menu=$("#themeMenu"),rect=e.currentTarget.getBoundingClientRect();
+  if(menu.style.display==="none"){menu.style.display="block";menu.style.top=(rect.bottom+4)+"px";menu.style.right=(window.innerWidth-rect.right)+"px"}
+  else menu.style.display="none";
+});
+$$("[data-theme]").forEach(b=>b.addEventListener("click",()=>setTheme(b.dataset.theme)));
+document.addEventListener("click",e=>{if(!e.target.closest("#themeMenu")&&!e.target.closest("#themeBtn"))$("#themeMenu").style.display="none"});
+
+$$(".lang-btn").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
+
+function updateCharCount(){
+  const txt=textInput.value,chars=txt.length,words=txt.trim()?txt.trim().split(/\s+/).length:0;
+  charCount.textContent=`${chars} ${t("charUnit")} · ${words} ${t("wordUnit")}`;
+}
+textInput.addEventListener("input",()=>{updateCharCount();localStorage.setItem("utts_text",textInput.value)});
+speedRange.addEventListener("input",()=>{speedVal.textContent=parseFloat(speedRange.value).toFixed(1)+"x";localStorage.setItem("utts_speed",speedRange.value)});
+pitchRange.addEventListener("input",()=>{pitchVal.textContent=parseFloat(pitchRange.value).toFixed(2);localStorage.setItem("utts_pitch",pitchRange.value)});
+
+$("#sampleBtn").addEventListener("click",()=>{
+  const voiceId=voiceSelect.value,lang=voiceId?detectVoiceLang(voiceId):"uz";
+  textInput.value=SAMPLES[lang]||SAMPLES.uz;updateCharCount();localStorage.setItem("utts_text",textInput.value);
+});
+$("#clearTextBtn").addEventListener("click",()=>{textInput.value="";updateCharCount();localStorage.removeItem("utts_text")});
+$("#clearAllBtn").addEventListener("click",()=>{
+  if(currentAudio){currentAudio.pause();currentAudio=null;currentPlayingId=null}
+  files=[];renderFiles();clearIDB();toast(t("cleared"),"success");
+});
+
+function detectVoiceLang(vid){
+  if(!vid)return"uz";
+  const v=vid.toLowerCase();
+  if(v.includes("sardor")||v.includes("madina")||v.includes("dilfuza")||v.includes("islom"))return"uz";
+  if(v.includes("boris")||v.includes("natasha")||v.includes("sergey"))return"ru";
+  if(v.includes("john")||v.includes("emily")||v.includes("michael"))return"en";
+  if(v.includes("mehmet")||v.includes("elif"))return"tr";
+  if(v.includes("aizhan")||v.includes("nurlan"))return"kk";
+  return"uz";
+}
+
+async function loadVoices(){
+  try{
+    const res=await fetch("/api/voices");
+    if(!res.ok)throw new Error("Failed to load voices");
+    const data=await res.json();
+    voiceSelect.innerHTML="";
+    const groups={};
+    (data.voices||data||[]).forEach(v=>{
+      const lang=v.language||v.lang||"other";
+      if(!groups[lang])groups[lang]=[];
+      groups[lang].push(v);
+    });
+    const langNames={uz:"O'zbekcha",ru:"Русский",en:"English",tr:"Türkçe",kk:"Қазақша"};
+    Object.keys(groups).forEach(lang=>{
+      const og=document.createElement("optgroup");
+      og.label=langNames[lang]||lang;
+      groups[lang].forEach(v=>{
+        const opt=document.createElement("option");
+        opt.value=v.id||v.name;
+        opt.textContent=(v.name||v.id)+(v.gender?" ("+v.gender+")":"");
+        og.appendChild(opt);
+      });
+      voiceSelect.appendChild(og);
+    });
+    const saved=localStorage.getItem("utts_voice");
+    if(saved&&voiceSelect.querySelector(`option[value="${saved}"]`))voiceSelect.value=saved;
+  }catch(e){
+    voiceSelect.innerHTML='<option value="Sardor">Sardor (erkak)</option><option value="Madina">Madina (ayol)</option>';
+  }
+}
+voiceSelect.addEventListener("change",()=>localStorage.setItem("utts_voice",voiceSelect.value));
+styleSelect.addEventListener("change",()=>localStorage.setItem("utts_style",styleSelect.value));
+
+function splitText(text,maxLen=2500){
+  const chunks=[];let remaining=text.trim();
+  while(remaining.length>0){
+    if(remaining.length<=maxLen){chunks.push(remaining);break}
+    let idx=remaining.lastIndexOf(".",maxLen);
+    if(idx<maxLen*0.3)idx=remaining.lastIndexOf(" ",maxLen);
+    if(idx<maxLen*0.3)idx=maxLen;
+    chunks.push(remaining.slice(0,idx+1).trim());
+    remaining=remaining.slice(idx+1).trim();
+  }
+  return chunks;
+}
+
+async function generate(){
+  const text=textInput.value.trim();
+  if(!text){toast(t("noText"),"error");return}
+  const voice=voiceSelect.value,style=styleSelect.value,speed=parseFloat(speedRange.value),pitch=parseFloat(pitchRange.value);
+  const chunks=splitText(text);
+  abortController=new AbortController;
+  genBtn.disabled=true;
+  genBtn.innerHTML=`<div class="spinner"></div><span>${t("generating")}</span> <button style="margin-left:8px;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.2);color:#fff;font-size:.75rem" id="cancelBtn">${t("cancel")}</button>`;
+  const cancelBtn=$("#cancelBtn");
+  if(cancelBtn)cancelBtn.addEventListener("click",()=>{if(abortController)abortController.abort()});
+
+  try{
+    const blobs=[];
+    for(const chunk of chunks){
+      const res=await fetch("/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:chunk,voice,style,speed,pitch}),signal:abortController.signal});
+      if(res.status===429){toast(t("rateLimited"),"error");return}
+      if(!res.ok)throw new Error(`HTTP ${res.status}`);
+      blobs.push(await res.blob());
+    }
+    const combined=new Blob(blobs,{type:"audio/mpeg"});
+    const url=URL.createObjectURL(combined);
+    const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    const now=new Date;
+    const name=`${t("filePre")}_${voice}_${now.getHours().toString().padStart(2,"0")}${now.getMinutes().toString().padStart(2,"0")}${now.getSeconds().toString().padStart(2,"0")}`;
+    const file={id,name,url,blob:combined,size:combined.size,date:now.toISOString(),voice,style};
+    files.unshift(file);
+    renderFiles();
+    saveToIDB(file);
+    toast("✓ "+name,"success");
+  }catch(e){
+    if(e.name==="AbortError")toast(t("cancel"),"");
+    else toast(t("errorGen")+": "+e.message,"error");
+  }finally{
+    abortController=null;
+    genBtn.disabled=false;
+    genBtn.innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5,3 19,12 5,21"/></svg><span data-i18n="generate">${t("generate")}</span>`;
+  }
+}
+
+genBtn.addEventListener("click",generate);
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&e.key==="Enter"){e.preventDefault();generate()}});
+
+function formatSize(bytes){if(bytes<1024)return bytes+" B";if(bytes<1048576)return(bytes/1024).toFixed(1)+" KB";return(bytes/1048576).toFixed(1)+" MB"}
+function formatDuration(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+":"+sec.toString().padStart(2,"0")}
+
+function renderFiles(){
+  const items=filesList.querySelectorAll(".file-item");items.forEach(i=>i.remove());
+  emptyState.style.display=files.length?"none":"flex";
+  files.forEach(f=>{
+    const div=document.createElement("div");div.className="file-item";div.dataset.id=f.id;
+    div.innerHTML=`
+      <div class="file-top">
+        <button class="play-btn" data-id="${f.id}"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg></button>
+        <div class="file-info"><div class="file-name">${f.name}.mp3</div><div class="file-detail">${formatSize(f.size)} · ${f.voice}</div></div>
+        <div class="file-actions">
+          <button title="Download" data-action="download" data-id="${f.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          <button title="Copy link" data-action="copy" data-id="${f.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+          <button title="Delete" data-action="delete" data-id="${f.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+        </div>
+      </div>
+      <div class="progress-bar" data-id="${f.id}"><div class="progress-fill"></div></div>`;
+    filesList.insertBefore(div,emptyState);
+  });
+}
+
+filesList.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-action]");
+  const playBtn=e.target.closest(".play-btn");
+  const progBar=e.target.closest(".progress-bar");
+  if(btn){
+    const action=btn.dataset.action,id=btn.dataset.id,file=files.find(f=>f.id===id);if(!file)return;
+    if(action==="download"){
+      const a=document.createElement("a");a.href=file.url;a.download=file.name+".mp3";a.click();toast(t("downloaded"),"success");
+    }else if(action==="copy"){
+      const link=window.location.origin+"/?q="+encodeURIComponent(textInput.value.slice(0,100));
+      navigator.clipboard.writeText(link).then(()=>toast(t("copied"),"success")).catch(()=>toast("Copy failed","error"));
+    }else if(action==="delete"){
+      if(currentPlayingId===id&&currentAudio){currentAudio.pause();currentAudio=null;currentPlayingId=null}
+      files=files.filter(f=>f.id!==id);renderFiles();deleteFromIDB(id);toast(t("deleted"),"");
+    }
+  }else if(playBtn){
+    togglePlay(playBtn.dataset.id);
+  }else if(progBar){
+    seekAudio(progBar,e);
+  }
+});
+
+function togglePlay(id){
+  const file=files.find(f=>f.id===id);if(!file)return;
+  if(currentPlayingId===id&&currentAudio){
+    if(currentAudio.paused){currentAudio.play()}else{currentAudio.pause()}
+    return;
+  }
+  if(currentAudio){currentAudio.pause();updatePlayBtn(currentPlayingId,false)}
+  currentAudio=new Audio(file.url);currentPlayingId=id;
+  currentAudio.play();updatePlayBtn(id,true);
+  currentAudio.addEventListener("timeupdate",()=>{
+    const item=filesList.querySelector(`.file-item[data-id="${id}"]`);if(!item)return;
+    const fill=item.querySelector(".progress-fill");
+    if(currentAudio.duration)fill.style.width=(currentAudio.currentTime/currentAudio.duration*100)+"%";
+    const detail=item.querySelector(".file-detail");
+    detail.textContent=`${formatDuration(currentAudio.currentTime)} / ${formatDuration(currentAudio.duration)} · ${file.voice}`;
+  });
+  currentAudio.addEventListener("ended",()=>{updatePlayBtn(id,false);const item=filesList.querySelector(`.file-item[data-id="${id}"]`);if(item)item.querySelector(".progress-fill").style.width="0"});
+  currentAudio.addEventListener("pause",()=>updatePlayBtn(id,false));
+  currentAudio.addEventListener("play",()=>updatePlayBtn(id,true));
+}
+
+function updatePlayBtn(id,playing){
+  const btn=filesList.querySelector(`.play-btn[data-id="${id}"]`);if(!btn)return;
+  btn.innerHTML=playing?'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>';
+}
+
+function seekAudio(bar,e){
+  if(!currentAudio||!currentAudio.duration)return;
+  const rect=bar.getBoundingClientRect(),ratio=(e.clientX-rect.left)/rect.width;
+  currentAudio.currentTime=ratio*currentAudio.duration;
+}
+
+function toast(msg,type){
+  const el=document.createElement("div");el.className="toast"+(type?" "+type:"");el.textContent=msg;
+  $("#toasts").appendChild(el);setTimeout(()=>el.remove(),3000);
+}
+
+function openIDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open("uzbekcha_tts",1);
+    req.onupgradeneeded=()=>req.result.createObjectStore("files",{keyPath:"id"});
+    req.onsuccess=()=>{db=req.result;resolve(db)};
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function saveToIDB(file){
+  if(!db)await openIDB();
+  const tx=db.transaction("files","readwrite");
+  tx.objectStore("files").put({id:file.id,name:file.name,blob:file.blob,size:file.size,date:file.date,voice:file.voice,style:file.style});
+}
+async function deleteFromIDB(id){
+  if(!db)await openIDB();
+  db.transaction("files","readwrite").objectStore("files").delete(id);
+}
+async function clearIDB(){
+  if(!db)await openIDB();
+  db.transaction("files","readwrite").objectStore("files").clear();
+}
+async function loadFromIDB(){
+  if(!db)await openIDB();
+  return new Promise(resolve=>{
+    const tx=db.transaction("files","readonly"),store=tx.objectStore("files"),req=store.getAll();
+    req.onsuccess=()=>{
+      const loaded=(req.result||[]).map(r=>({...r,url:URL.createObjectURL(r.blob)})).sort((a,b)=>new Date(b.date)-new Date(a.date));
+      resolve(loaded);
+    };
+    req.onerror=()=>resolve([]);
+  });
+}
+
+async function init(){
+  const savedTheme=localStorage.getItem("utts_theme");if(savedTheme&&THEMES.includes(savedTheme))setTheme(savedTheme);
+  const savedLang=localStorage.getItem("utts_lang");if(savedLang)setLang(savedLang);else applyI18n();
+  const savedText=localStorage.getItem("utts_text");if(savedText)textInput.value=savedText;
+  const savedSpeed=localStorage.getItem("utts_speed");if(savedSpeed){speedRange.value=savedSpeed;speedVal.textContent=parseFloat(savedSpeed).toFixed(1)+"x"}
+  const savedPitch=localStorage.getItem("utts_pitch");if(savedPitch){pitchRange.value=savedPitch;pitchVal.textContent=parseFloat(savedPitch).toFixed(2)}
+  const savedStyle=localStorage.getItem("utts_style");if(savedStyle)styleSelect.value=savedStyle;
+  updateCharCount();
+  loadVoices().then(()=>{const sv=localStorage.getItem("utts_voice");if(sv&&voiceSelect.querySelector(`option[value="${sv}"]`))voiceSelect.value=sv});
+  try{files=await loadFromIDB();renderFiles()}catch(e){}
+}
+init();
+})();
+</script>
+</body>
+</html>
